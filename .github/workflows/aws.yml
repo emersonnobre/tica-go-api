@@ -1,0 +1,78 @@
+name: Deploy API
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Set up Go
+              uses: actions/setup-go@v2
+              with:
+                go-version: '1.23.1'
+
+            - name: Install dependencies
+              run: go mod tidy
+
+            - name: Build
+              run: go build -o out .
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v2
+              with:
+                name: tica-api
+                path: ./out
+
+    deploy:
+        runs-on: ubuntu-latest
+        needs: build
+        environment: Production
+
+        steps:
+            - name: Download artifact
+              uses: actions/download-artifact@v2
+              with:
+                name: tica-api
+
+            - name: Deploy to EC2
+              uses: appleboy/scp-action@master
+              with:
+                host: ${{ secrets.EC2_HOST }}
+                username: ${{ secrets.EC2_USER }}
+                key: ${{ secrets.EC2_SSH_KEY }}
+                port: 22
+                source: "tica-api"
+                target: "/home/ubuntu/tica-api-go"
+
+            - name: SSH commands
+              uses: appleboy/ssh-action@master
+              with:
+                host: ${{ secrets.EC2_HOST }}
+                username: ${{ secrets.EC2_USER }}
+                key: ${{ secrets.EC2_SSH_KEY }}
+                script: |
+                    echo '[Unit]
+                    Description=My Go Application
+                    After=network.target
+
+                    [Service]
+                    WorkingDirectory=/home/ubuntu
+                    ExecStart=/home/ubuntu/tica-api-go
+                    Restart=always
+                    RestartSec=10
+                    SyslogIdentifier=tica-api-go
+                    User=ubuntu
+
+                    [Install]
+                    WantedBy=multi-user.target' | sudo tee /etc/systemd/system/tica-api-go.service
+
+                    # Habilita e inicia o serviço
+                    sudo systemctl enable tica-api-go.service
+                    sudo systemctl restart tica-api-go.service
