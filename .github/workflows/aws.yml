@@ -21,13 +21,6 @@ jobs:
             - name: Install dependencies
               run: go mod tidy
 
-            - name: environment variables
-              run: | 
-                    export MYSQL_HOST=${{ secrets.MYSQL_HOST }}
-                    export MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}
-                    export MYSQL_USER=${{ secrets.MYSQL_USER }}
-                    export MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
-
             - name: Build
               run: go build -o out/tica-api cmd/api/main.go
 
@@ -85,11 +78,6 @@ jobs:
 
                     [Install]
                     WantedBy=multi-user.target' | sudo tee /etc/systemd/system/tica-api-go.service
-
-                    export MYSQL_HOST=${{ secrets.MYSQL_HOST }}
-                    export MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}
-                    export MYSQL_USER=${{ secrets.MYSQL_USER }}
-                    export MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
 
                     # Habilita e inicia o serviço
                     sudo systemctl enable tica-api-go.service
