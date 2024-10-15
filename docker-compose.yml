@@ -1,0 +1,19 @@
+version: "3.9"  # Versão do Docker Compose
+
+services:
+  mysql:
+    image: mysql:latest  # Imagem do MySQL a ser utilizada
+    container_name: local-mysql  # Nome do container
+    restart: always  # Reinicia o container automaticamente em caso de falha
+    environment:
+      MYSQL_ROOT_PASSWORD: senha123  # Define a senha do root
+      MYSQL_DATABASE: tica_db  # Cria um banco de dados (opcional)
+      MYSQL_USER: tica_user  # Cria um usuário (opcional)
+      MYSQL_PASSWORD: tica123  # Define a senha do usuário (opcional)
+    volumes:
+      - meu-volume-mysql:/var/lib/mysql  # Mapeia o volume para persistir os dados
+    ports:
+      - "3306:3306"  # Mapeia a porta 3306 do container para a porta 3306 do host
+
+volumes:
+  meu-volume-mysql:  # Define o volume
