@@ -64,6 +64,10 @@ jobs:
                     After=network.target
 
                     [Service]
+                    Environment="MYSQL_HOST=${{ secrets.MYSQL_HOST }}"
+                    Environment="MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
+                    Environment="MYSQL_USER=${{ secrets.MYSQL_USER }}"
+                    Environment="MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}"
                     WorkingDirectory=/home/ubuntu
                     ExecStart=/home/ubuntu/tica-api-go
                     Restart=always
