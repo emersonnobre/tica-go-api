@@ -33,18 +33,29 @@ func (r *MySQLAddressRepository) Create(address domain.Address) error {
 	return nil
 }
 
-func (r *MySQLAddressRepository) GetByCustomerId(id int) (*domain.Address, error) {
-	var address domain.Address
+func (r *MySQLAddressRepository) GetByCustomerId(id int) ([]domain.Address, error) {
 	query := fmt.Sprintf("SELECT id, street, neighborhood, cep, customer_id FROM addresses WHERE customer_id = %d", id)
-	result := r.db.QueryRow(query)
-	err := result.Scan(&address.Id, &address.Street, &address.Neighborhood, &address.Cep, &address.CustomerId)
+	result, err := r.db.Query(query)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
 		return nil, err
 	}
-	return &address, nil
+	defer result.Close()
+
+	var addresses []domain.Address
+	for result.Next() {
+		var address domain.Address
+		err := result.Scan(&address.Id, &address.Street, &address.Id, &address.Street, &address.Neighborhood, &address.Cep, &address.CustomerId)
+		if err != nil {
+			return nil, err
+		}
+		addresses = append(addresses, address)
+	}
+	err = result.Err()
+
+	if err != nil {
+		return nil, err
+	}
+	return addresses, nil
 }
 
 func (r *MySQLAddressRepository) Delete(id int) error {

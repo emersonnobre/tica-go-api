@@ -71,6 +71,30 @@ func (r *MySQLCustomerRepository) GetById(id int) (*domain.Customer, error) {
 		}
 		return nil, err
 	}
+
+	query = fmt.Sprintf("SELECT id, street, neighborhood, cep, customer_id FROM addresses WHERE customer_id = %d", customer.Id)
+	results, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer results.Close()
+
+	var addresses []domain.Address
+	for results.Next() {
+		var address domain.Address
+		err := results.Scan(&address.Id, &address.Street, &address.Neighborhood, &address.Cep, &address.CustomerId)
+		if err != nil {
+			return nil, err
+		}
+		addresses = append(addresses, address)
+	}
+	err = result.Err()
+
+	if err != nil {
+		return nil, err
+	}
+
+	customer.Addresses = addresses
 	return &customer, nil
 }
 

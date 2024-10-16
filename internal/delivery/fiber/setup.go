@@ -25,6 +25,9 @@ func (f *FiberSetup) Execute() {
 	connection := activateDBConnection(&mysqlConnection)
 	defer connection.Close()
 
+	addressRepository := mysql_repository.NewMySQLAddressRepository(connection)
+	createAddressUseCase := usecases.NewCreateAddressUseCase(addressRepository)
+
 	// category dependencies
 	categoryRepository := mysql_repository.NewMySQLCategoryRepository(connection)
 	createCategoryUseCase := usecases.NewCreateCategoryUseCase(categoryRepository)
@@ -41,7 +44,7 @@ func (f *FiberSetup) Execute() {
 
 	// customer dependencies
 	customerRepository := mysql_repository.NewMySQLCustomerRepository(connection)
-	createCustomerUseCase := usecases.NewCreateCustomerUseCase(customerRepository)
+	createCustomerUseCase := usecases.NewCreateCustomerUseCase(customerRepository, createAddressUseCase)
 	getCustomerUseCase := usecases.NewGetCustomerUseCase(customerRepository)
 	updateCustomerUseCase := usecases.NewUpdateCustomerUseCase(customerRepository)
 	customerHandler := handlers.NewCustomerHandler(createCustomerUseCase, getCustomerUseCase, updateCustomerUseCase)
