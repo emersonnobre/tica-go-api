@@ -39,6 +39,13 @@ func (f *FiberSetup) Execute() {
 	employeeHandler := handlers.NewEmployeeHandler(createEmployeeUseCase, getEmployeeUseCase)
 	employeeHandler.RegisterRoutes(app)
 
+	// customer dependencies
+	customerRepository := mysql_repository.NewMySQLCustomerRepository(connection)
+	createCustomerUseCase := usecases.NewCreateCustomerUseCase(customerRepository)
+	getCustomerUseCase := usecases.NewGetCustomerUseCase(customerRepository)
+	customerHandler := handlers.NewCustomerHandler(createCustomerUseCase, getCustomerUseCase)
+	customerHandler.RegisterRoutes(app)
+
 	app.Listen(":3000")
 }
 

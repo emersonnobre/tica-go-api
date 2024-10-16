@@ -10,3 +10,6 @@ migrate-dev-up:
 	go run cmd/migrate/main.go development up
 migrate-dev-down:
 	go run cmd/migrate/main.go development down
+
+generate-json:
+	./scripts/create_json/run -file internal/core/domain/$(filter-out $@,$(MAKECMDGOALS))
