@@ -18,7 +18,7 @@ func NewMySQLCategoryRepository(db *sql.DB) *MySQLCategoryRepository {
 }
 
 func (r *MySQLCategoryRepository) Create(category domain.Category) error {
-	stmt, err := r.db.Prepare("INSERT INTO category(description) VALUES(?)")
+	stmt, err := r.db.Prepare("INSERT INTO categories(description) VALUES(?)")
 
 	if err != nil {
 		return err

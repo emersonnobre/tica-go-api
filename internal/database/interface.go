@@ -12,4 +12,5 @@ type DatabaseConfig struct {
 	DatabaseName string
 	User         string
 	Password     string
+	Tls          string
 }

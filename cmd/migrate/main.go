@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/emersonnobre/tica-api-go/internal/database"
 	"github.com/golang-migrate/migrate/v4"
@@ -13,14 +14,15 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	var env, action string
+	if len(os.Args) > 1 {
+		env = os.Args[1]
+		action = os.Args[2]
+	}
 
-	// cfg := mysqlDriver.Config{
-	// 	Addr:         os.Getenv("MYSQL_HOST"),
-	// 	DBName: os.Getenv("MYSQL_DATABASE"),
-	// 	User:         os.Getenv("MYSQL_USER"),
-	// 	Passwd:     os.Getenv("MYSQL_PASSWORD"),
-	// }
+	envFile := pickEnvironmentFile(env)
+
+	godotenv.Load(envFile)
 
 	mysqlConn := database.NewMySQLDatabase()
 	db, err := mysqlConn.Connect()
@@ -45,5 +47,21 @@ func main() {
 	}
 
 	fmt.Println(m)
-	m.Up()
+
+	if action == "up" {
+		m.Up()
+	} else if action == "down" {
+		m.Down()
+	}
+}
+
+func pickEnvironmentFile(env string) string {
+	switch env {
+	case "development":
+		return ".env.development"
+	case "production":
+		return ".env.production"
+	default:
+		return ".env.production"
+	}
 }
