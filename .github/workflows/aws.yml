@@ -69,6 +69,7 @@ jobs:
             Environment="MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
             Environment="MYSQL_USER=${{ secrets.MYSQL_USER }}"
             Environment="MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}"
+            Environment="MYSQL_TLS=true"
             WorkingDirectory=/home/ubuntu
             ExecStart=/home/ubuntu/tica-api-go/tica-api
             Restart=always
