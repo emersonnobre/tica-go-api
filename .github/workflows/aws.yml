@@ -21,17 +21,15 @@ jobs:
 
       - name: Install dependencies
         run: go mod tidy
-
-      - name: Export environment variables
+        
+      - name: Run migrations
         run: |
           export MYSQL_HOST=${{ secrets.MYSQL_HOST }}
           export MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}
           export MYSQL_USER=${{ secrets.MYSQL_USER }}
           export MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
           export MYSQL_TLS=true
-        
-      - name: Run migrations
-        run: make migrate-prod-up
+          make migrate-prod-up
 
       - name: Build
         run: go build -o out/tica-api cmd/api/main.go
