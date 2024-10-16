@@ -15,6 +15,7 @@ type CustomerHandler struct {
 	getCustomerUseCase    *usecases.GetCustomerUseCase
 	updateCustomerUseCase *usecases.UpdateCustomerUseCase
 	removeCustomerUseCase *usecases.RemoveCustomerUseCase
+	getCustomersUseCase   *usecases.GetCustomersUseCase
 }
 
 func NewCustomerHandler(
@@ -22,12 +23,14 @@ func NewCustomerHandler(
 	getCustomerUseCase *usecases.GetCustomerUseCase,
 	updateCustomerUseCase *usecases.UpdateCustomerUseCase,
 	removeCustomerUseCase *usecases.RemoveCustomerUseCase,
+	getCustomersUseCase *usecases.GetCustomersUseCase,
 ) *CustomerHandler {
 	return &CustomerHandler{
 		createCustomerUseCase: createCustomerUseCase,
 		getCustomerUseCase:    getCustomerUseCase,
 		updateCustomerUseCase: updateCustomerUseCase,
 		removeCustomerUseCase: removeCustomerUseCase,
+		getCustomersUseCase:   getCustomersUseCase,
 	}
 }
 
@@ -35,6 +38,7 @@ func (h *CustomerHandler) RegisterRoutes(app *fiber.App) {
 	group := app.Group("/customers")
 
 	group.Post("/", h.Create)
+	group.Get("/", h.Get)
 	group.Get("/:id", h.GetById)
 	group.Put("/:id", h.Update)
 	group.Delete("/:id", h.Delete)
@@ -50,6 +54,19 @@ func (h *CustomerHandler) Create(ctx *fiber.Ctx) error {
 		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
 	}
 	return ctx.SendStatus(http.StatusCreated)
+}
+
+func (h *CustomerHandler) Get(ctx *fiber.Ctx) error {
+	limit, _ := strconv.Atoi(ctx.Query("limit", "10"))
+	offset, _ := strconv.Atoi(ctx.Query("offset", "0"))
+	orderBy := ctx.Query("order_by", "name")
+	order := ctx.Query("order", "asc")
+
+	response := h.getCustomersUseCase.Execute(limit, offset, orderBy, order)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.Status(fiber.StatusOK).JSON(response.Data)
 }
 
 func (h *CustomerHandler) GetById(ctx *fiber.Ctx) error {

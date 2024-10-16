@@ -17,20 +17,22 @@ func NewMySQLCustomerRepository(db *sql.DB) *MySQLCustomerRepository {
 	}
 }
 
-func (r *MySQLCustomerRepository) Create(customer domain.Customer) error {
+func (r *MySQLCustomerRepository) Create(customer domain.Customer) (*int, error) {
 	stmt, err := r.db.Prepare("INSERT INTO customers(name, cpf, phone, email, instagram, birthday, active, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?)")
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(customer.Name, customer.Cpf, customer.Phone, customer.Email, customer.Instagram, customer.Birthday, customer.Active, customer.CreatedAt)
+	result, err := stmt.Exec(customer.Name, customer.Cpf, customer.Phone, customer.Email, customer.Instagram, customer.Birthday, customer.Active, customer.CreatedAt)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	id, _ := result.LastInsertId()
+	response := int(id)
+	return &response, nil
 }
 
 func (r *MySQLCustomerRepository) Update(customer domain.Customer) error {
@@ -47,6 +49,39 @@ func (r *MySQLCustomerRepository) Update(customer domain.Customer) error {
 	}
 
 	return nil
+}
+
+func (r *MySQLCustomerRepository) Get(limit int, offset int, orderBy string, order string) ([]domain.Customer, error) {
+	query := fmt.Sprintf("SELECT id, name, cpf FROM customers WHERE active = TRUE ORDER BY %s %s LIMIT %d OFFSET %d", orderBy, order, limit, offset)
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var customers []domain.Customer
+	for rows.Next() {
+		var customer domain.Customer
+		err := rows.Scan(&customer.Id, &customer.Name, &customer.Cpf)
+		if err != nil {
+			return nil, err
+		}
+		customers = append(customers, customer)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return customers, nil
+}
+
+func (r *MySQLCustomerRepository) GetCount() (int, error) {
+	var count int
+	query := "SELECT COUNT(*) FROM customers WHERE active = TRUE"
+	row := r.db.QueryRow(query)
+	row.Scan(&count)
+	return count, nil
 }
 
 func (r *MySQLCustomerRepository) GetById(id int) (*domain.Customer, error) {
