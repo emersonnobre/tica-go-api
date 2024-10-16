@@ -7,3 +7,7 @@ func GetInternalErrorName() string {
 func GetValidationErrorName() string {
 	return "validation.error"
 }
+
+func GetNotFoundErrorName() string {
+	return "not.found.error"
+}

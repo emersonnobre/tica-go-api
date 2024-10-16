@@ -10,6 +10,8 @@ func CoreErrorToHttpError(coreErrorName string) int {
 		return fiber.StatusInternalServerError
 	case "validation.error":
 		return fiber.StatusBadRequest
+	case "not.found.error":
+		return fiber.StatusNotFound
 	default:
 		return fiber.StatusInternalServerError
 	}

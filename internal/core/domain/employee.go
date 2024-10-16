@@ -1,7 +1,8 @@
 package domain
 
 type Employee struct {
-	Id        string `json:"id"`
+	Id        int    `json:"id"`
 	Name      string `json:"name"`
-	CreatedAt string `json:"-"`
+	Cpf       string `json:"cpf"`
+	CreatedAt string `json:"created_at"`
 }
