@@ -59,7 +59,7 @@ func (r *MySQLAddressRepository) GetByCustomerId(id int) ([]domain.Address, erro
 }
 
 func (r *MySQLAddressRepository) Delete(id int) error {
-	stmt, err := r.db.Prepare("DELETE FROM addresses WHERE id = ?)")
+	stmt, err := r.db.Prepare("DELETE FROM addresses WHERE id = ?")
 
 	if err != nil {
 		return err

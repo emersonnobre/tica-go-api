@@ -10,17 +10,25 @@ import (
 )
 
 type UpdateCustomerUseCase struct {
-	repository repositories.CustomerRepository
+	repository           repositories.CustomerRepository
+	createAddressUseCase *CreateAddressUseCase
+	removeAddressUseCase *RemoveAddressUseCase
 }
 
-func NewUpdateCustomerUseCase(repository repositories.CustomerRepository) *UpdateCustomerUseCase {
+func NewUpdateCustomerUseCase(
+	repository repositories.CustomerRepository,
+	createAddressUseCase *CreateAddressUseCase,
+	removeAddressUseCase *RemoveAddressUseCase,
+) *UpdateCustomerUseCase {
 	return &UpdateCustomerUseCase{
-		repository: repository,
+		repository:           repository,
+		createAddressUseCase: createAddressUseCase,
+		removeAddressUseCase: removeAddressUseCase,
 	}
 }
 
 func (u *UpdateCustomerUseCase) Execute(customer domain.Customer) types.UseCaseResponse {
-	customerInDB, err := u.repository.GetByCPF(*customer.Cpf)
+	customerInDB, err := u.repository.GetById(customer.Id)
 
 	if err != nil {
 		log.Println("ERROR:", err)
@@ -40,6 +48,24 @@ func (u *UpdateCustomerUseCase) Execute(customer domain.Customer) types.UseCaseR
 	customerInDB.Birthday = customer.Birthday
 	currentDate := time.Now().Format("2006-01-02 15:04:05")
 	customerInDB.UpdatedAt = &currentDate
+
+	for _, address := range customerInDB.Addresses {
+		remove := true
+		for _, item := range customer.Addresses {
+			if item.Id == address.Id {
+				remove = false
+			}
+		}
+		if remove {
+			u.removeAddressUseCase.Execute(address.Id)
+		}
+	}
+
+	for _, item := range customer.Addresses {
+		if item.Id == 0 {
+			u.createAddressUseCase.Execute(item)
+		}
+	}
 
 	if err := u.repository.Update(*customerInDB); err != nil {
 		log.Println("ERROR:", err)
