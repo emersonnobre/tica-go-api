@@ -20,9 +20,10 @@ func main() {
 		action = os.Args[2]
 	}
 
-	envFile := pickEnvironmentFile(env)
-
-	godotenv.Load(envFile)
+	if env == "development" {
+		envFile := pickEnvironmentFile(env)
+		godotenv.Load(envFile)
+	}
 
 	mysqlConn := database.NewMySQLDatabase()
 	db, err := mysqlConn.Connect()
