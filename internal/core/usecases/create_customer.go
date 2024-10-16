@@ -31,7 +31,7 @@ func (u *CreateCustomerUseCase) Execute(customer domain.Customer) types.UseCaseR
 			return types.NewUseCaseResponse(nil, &errorName, &message)
 		}
 
-		if customerInDB != nil {
+		if customerInDB != nil && customerInDB.Active {
 			message, errorName := "Já existe um cliente com este CPF!", types.GetValidationErrorName()
 			return types.NewUseCaseResponse(nil, &errorName, &message)
 		}
@@ -41,19 +41,28 @@ func (u *CreateCustomerUseCase) Execute(customer domain.Customer) types.UseCaseR
 	customer.Active = true
 	customer.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
 
+	if err := u.repository.Create(customer); err != nil {
+		log.Println("ERROR:", err)
+		message, errorName := "Erro ao criar cliente!", types.GetInternalErrorName()
+		return types.NewUseCaseResponse(nil, &errorName, &message)
+	}
+
+	createdCustomer, err := u.repository.GetByCPF(*customer.Cpf)
+
+	if err != nil {
+		log.Println("ERROR:", err)
+		message, errorName := "Erro ao criar cliente!", types.GetInternalErrorName()
+		return types.NewUseCaseResponse(nil, &errorName, &message)
+	}
+
 	if len(customer.Addresses) > 0 {
 		for _, address := range customer.Addresses {
+			address.CustomerId = createdCustomer.Id
 			response := u.createAddressUseCase.Execute(address)
 			if response.ErrorName != nil {
 				return response
 			}
 		}
-	}
-
-	if err := u.repository.Create(customer); err != nil {
-		log.Println("ERROR:", err)
-		message, errorName := "Erro ao criar cliente!", types.GetInternalErrorName()
-		return types.NewUseCaseResponse(nil, &errorName, &message)
 	}
 
 	return types.NewUseCaseResponse(nil, nil, nil)

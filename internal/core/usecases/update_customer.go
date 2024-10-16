@@ -63,6 +63,7 @@ func (u *UpdateCustomerUseCase) Execute(customer domain.Customer) types.UseCaseR
 
 	for _, item := range customer.Addresses {
 		if item.Id == 0 {
+			item.CustomerId = customer.Id
 			u.createAddressUseCase.Execute(item)
 		}
 	}

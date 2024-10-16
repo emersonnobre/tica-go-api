@@ -51,7 +51,7 @@ func (r *MySQLCustomerRepository) Update(customer domain.Customer) error {
 
 func (r *MySQLCustomerRepository) GetById(id int) (*domain.Customer, error) {
 	var customer domain.Customer
-	query := fmt.Sprintf("SELECT id, name, cpf, phone, email, instagram, birthday, active, created_at, updated_at FROM customers WHERE id = %d", id)
+	query := fmt.Sprintf("SELECT id, name, cpf, phone, email, instagram, birthday, active, created_at, updated_at FROM customers WHERE id = %d and active = TRUE", id)
 	result := r.db.QueryRow(query)
 	err := result.Scan(
 		&customer.Id,
@@ -100,7 +100,7 @@ func (r *MySQLCustomerRepository) GetById(id int) (*domain.Customer, error) {
 
 func (r *MySQLCustomerRepository) GetByCPF(cpf string) (*domain.Customer, error) {
 	var customer domain.Customer
-	query := fmt.Sprintf("SELECT id, name, cpf, phone, email, instagram, birthday, active, created_at FROM customers WHERE cpf = %s", cpf)
+	query := fmt.Sprintf("SELECT id, name, cpf, phone, email, instagram, birthday, active, created_at FROM customers WHERE cpf = %s and active = TRUE", cpf)
 	result := r.db.QueryRow(query)
 	err := result.Scan(&customer.Id, &customer.Name, &customer.Cpf, &customer.Phone, &customer.Email, &customer.Instagram, &customer.Birthday, &customer.Active, &customer.CreatedAt)
 	if err != nil {
@@ -110,4 +110,20 @@ func (r *MySQLCustomerRepository) GetByCPF(cpf string) (*domain.Customer, error)
 		return nil, err
 	}
 	return &customer, nil
+}
+
+func (r *MySQLCustomerRepository) Delete(id int) error {
+	stmt, err := r.db.Prepare("UPDATE customers SET active = FALSE, updated_at = NOW() WHERE id = ?")
+
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
