@@ -48,7 +48,8 @@ func (f *FiberSetup) Execute() {
 	createCustomerUseCase := usecases.NewCreateCustomerUseCase(customerRepository, createAddressUseCase)
 	getCustomerUseCase := usecases.NewGetCustomerUseCase(customerRepository)
 	updateCustomerUseCase := usecases.NewUpdateCustomerUseCase(customerRepository, createAddressUseCase, removeAddressUseCase)
-	customerHandler := handlers.NewCustomerHandler(createCustomerUseCase, getCustomerUseCase, updateCustomerUseCase)
+	removeCustomerUseCase := usecases.NewRemoveCustomerUseCase(customerRepository)
+	customerHandler := handlers.NewCustomerHandler(createCustomerUseCase, getCustomerUseCase, updateCustomerUseCase, removeCustomerUseCase)
 	customerHandler.RegisterRoutes(app)
 
 	app.Listen(":3000")

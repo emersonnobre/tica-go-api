@@ -7,4 +7,5 @@ type CustomerRepository interface {
 	Update(domain.Customer) error
 	GetById(int) (*domain.Customer, error)
 	GetByCPF(string) (*domain.Customer, error)
+	Delete(int) error
 }

@@ -14,13 +14,20 @@ type CustomerHandler struct {
 	createCustomerUseCase *usecases.CreateCustomerUseCase
 	getCustomerUseCase    *usecases.GetCustomerUseCase
 	updateCustomerUseCase *usecases.UpdateCustomerUseCase
+	removeCustomerUseCase *usecases.RemoveCustomerUseCase
 }
 
-func NewCustomerHandler(createCustomerUseCase *usecases.CreateCustomerUseCase, getCustomerUseCase *usecases.GetCustomerUseCase, updateCustomerUseCase *usecases.UpdateCustomerUseCase) *CustomerHandler {
+func NewCustomerHandler(
+	createCustomerUseCase *usecases.CreateCustomerUseCase,
+	getCustomerUseCase *usecases.GetCustomerUseCase,
+	updateCustomerUseCase *usecases.UpdateCustomerUseCase,
+	removeCustomerUseCase *usecases.RemoveCustomerUseCase,
+) *CustomerHandler {
 	return &CustomerHandler{
 		createCustomerUseCase: createCustomerUseCase,
 		getCustomerUseCase:    getCustomerUseCase,
 		updateCustomerUseCase: updateCustomerUseCase,
+		removeCustomerUseCase: removeCustomerUseCase,
 	}
 }
 
@@ -30,6 +37,7 @@ func (h *CustomerHandler) RegisterRoutes(app *fiber.App) {
 	group.Post("/", h.Create)
 	group.Get("/:id", h.GetById)
 	group.Put("/:id", h.Update)
+	group.Delete("/:id", h.Delete)
 }
 
 func (h *CustomerHandler) Create(ctx *fiber.Ctx) error {
@@ -72,6 +80,20 @@ func (h *CustomerHandler) Update(ctx *fiber.Ctx) error {
 
 	customer.Id = id
 	response := h.updateCustomerUseCase.Execute(customer)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.SendStatus(fiber.StatusNoContent)
+}
+
+func (h *CustomerHandler) Delete(ctx *fiber.Ctx) error {
+	id, err := strconv.Atoi(ctx.Params("id"))
+
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
+	}
+
+	response := h.removeCustomerUseCase.Execute(id)
 	if response.ErrorName != nil {
 		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
 	}
