@@ -9,5 +9,6 @@ type Customer struct {
 	Instagram *string `json:"instagram"`
 	Birthday  *string `json:"birthday"`
 	CreatedAt string  `json:"created_at"`
+	UpdatedAt *string `json:"updated_at"`
 	Active    bool    `json:"-"`
 }

@@ -1,0 +1,2 @@
+ALTER TABLE customers
+ADD COLUMN updated_at DATETIME NULL;

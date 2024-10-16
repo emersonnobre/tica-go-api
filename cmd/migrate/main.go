@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -47,10 +46,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(m)
-
 	if action == "up" {
-		m.Up()
+		err := m.Up()
+		if err != nil {
+			log.Fatal(err)
+		}
 	} else if action == "down" {
 		m.Down()
 	}
