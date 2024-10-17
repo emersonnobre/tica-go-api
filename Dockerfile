@@ -8,6 +8,12 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main ./cmd/api/main.go
+RUN go install github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+RUN go install github.com/swaggo/swag/cmd/swag@latest 
+
+RUN make run-dev
+
+RUN go build -o main ./src/main.go
+EXPOSE 3000
 
 CMD ["./main"]

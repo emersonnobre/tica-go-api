@@ -7,9 +7,18 @@ import (
 	"github.com/emersonnobre/tica-api-go/src/internal/delivery/fiber/handlers"
 	mysql_repository "github.com/emersonnobre/tica-api-go/src/internal/repositories/mysql"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func SetupAPI(app *fiber.App, connection *sql.DB) {
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost,http://localhost:3000",
+		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
+		AllowHeaders:     "Origin, Content-Type, Accept, Accept-Encoding, X-CSRF-Token, Authorization",
+		AllowCredentials: true,
+		ExposeHeaders:    "Content-Length",
+	}))
+
 	setupDependencies(app, connection)
 }
 

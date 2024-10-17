@@ -1,12 +1,10 @@
 run-dev:
-	@echo "Iniciando servidor"
 	cd src
 	swag init --dir src --output src/docs
-	go run src/main.go development
 run-prod:
 	go run src/main.go production
 
-create-dev-database:
+run-container:
 	docker-compose up -d --build
 
 migration:

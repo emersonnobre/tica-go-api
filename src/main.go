@@ -18,6 +18,7 @@ import (
 // @description This is a sample swagger for Fiber
 // @host localhost:3000
 // @BasePath /
+// @schemes http https
 func main() {
 	var env string
 	if len(os.Args) > 1 {
