@@ -16,6 +16,30 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/categories": {
+            "get": {
+                "description": "Obtém todas as categorias sem filtro ou ordenação.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Obter todas as categorias",
+                "responses": {
+                    "200": {
+                        "description": "Uma lista de categorias",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Category"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do sistema"
+                    }
+                }
+            },
             "post": {
                 "description": "Cria uma nova categoria.",
                 "consumes": [

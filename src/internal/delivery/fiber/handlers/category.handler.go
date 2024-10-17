@@ -53,6 +53,15 @@ func (h *CategoryHandler) Create(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(http.StatusCreated)
 }
 
+// GetAllCategories godoc
+//
+//		@Summary        Obter todas as categorias
+//		@Description    Obtém todas as categorias sem filtro ou ordenação.
+//		@Tags           categories
+//		@Produce        json
+//		@Success        200 {array}	domain.Category "Uma lista de categorias"
+//	    @Failure        500 "Erro interno do sistema"
+//		@Router         /categories [get]
 func (h *CategoryHandler) Get(ctx *fiber.Ctx) error {
 	response := h.getCategoriesUseCase.Execute()
 	if response.ErrorName != nil {

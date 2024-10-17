@@ -15,6 +15,22 @@ info:
   version: "1.0"
 paths:
   /categories:
+    get:
+      description: Obtém todas as categorias sem filtro ou ordenação.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Uma lista de categorias
+          schema:
+            items:
+              $ref: '#/definitions/domain.Category'
+            type: array
+        "500":
+          description: Erro interno do sistema
+      summary: Obter todas as categorias
+      tags:
+      - categories
     post:
       consumes:
       - application/json
