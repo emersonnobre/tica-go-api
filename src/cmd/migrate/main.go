@@ -49,7 +49,9 @@ func main() {
 	if action == "up" {
 		err := m.Up()
 		if err != nil {
-			log.Fatal(err)
+			if err != migrate.ErrNoChange {
+				log.Fatal(err)
+			}
 		}
 	} else if action == "down" {
 		m.Down()
