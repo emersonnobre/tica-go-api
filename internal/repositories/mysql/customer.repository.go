@@ -76,9 +76,9 @@ func (r *MySQLCustomerRepository) Get(limit int, offset int, orderBy string, ord
 	return customers, nil
 }
 
-func (r *MySQLCustomerRepository) GetCount() (int, error) {
+func (r *MySQLCustomerRepository) GetCount(where string) (int, error) {
 	var count int
-	query := "SELECT COUNT(*) FROM customers WHERE active = TRUE"
+	query := fmt.Sprintf("SELECT COUNT(*) FROM customers %s", where)
 	row := r.db.QueryRow(query)
 	row.Scan(&count)
 	return count, nil
