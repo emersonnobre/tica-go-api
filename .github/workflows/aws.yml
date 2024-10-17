@@ -32,7 +32,7 @@ jobs:
           make migrate-prod-up
 
       - name: Build
-        run: go build -o out/tica-api cmd/api/main.go
+        run: go build -o out/tica-api src/main.go
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

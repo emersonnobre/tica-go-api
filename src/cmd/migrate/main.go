@@ -37,7 +37,7 @@ func main() {
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://cmd/migrate/migrations",
+		"file://src/cmd/migrate/migrations",
 		"mysql",
 		driver,
 	)
