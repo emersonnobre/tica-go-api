@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/emersonnobre/tica-api-go/internal/core/domain"
+	"github.com/emersonnobre/tica-api-go/internal/core/repositories"
+	"github.com/emersonnobre/tica-api-go/internal/repositories/mysql/util"
 )
 
 type MySQLCustomerRepository struct {
@@ -51,8 +53,8 @@ func (r *MySQLCustomerRepository) Update(customer domain.Customer) error {
 	return nil
 }
 
-func (r *MySQLCustomerRepository) Get(limit int, offset int, orderBy string, order string) ([]domain.Customer, error) {
-	query := fmt.Sprintf("SELECT id, name, cpf FROM customers WHERE active = TRUE ORDER BY %s %s LIMIT %d OFFSET %d", orderBy, order, limit, offset)
+func (r *MySQLCustomerRepository) Get(limit int, offset int, orderBy string, order string, filters []repositories.Filter) ([]domain.Customer, error) {
+	query := fmt.Sprintf("SELECT id, name, cpf FROM customers %s ORDER BY %s %s LIMIT %d OFFSET %d", util.BuildConditionsString(filters), orderBy, order, limit, offset)
 	rows, err := r.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -76,9 +78,9 @@ func (r *MySQLCustomerRepository) Get(limit int, offset int, orderBy string, ord
 	return customers, nil
 }
 
-func (r *MySQLCustomerRepository) GetCount(where string) (int, error) {
+func (r *MySQLCustomerRepository) GetCount(filters []repositories.Filter) (int, error) {
 	var count int
-	query := fmt.Sprintf("SELECT COUNT(*) FROM customers %s", where)
+	query := fmt.Sprintf("SELECT COUNT(*) FROM customers %s", util.BuildConditionsString(filters))
 	row := r.db.QueryRow(query)
 	row.Scan(&count)
 	return count, nil

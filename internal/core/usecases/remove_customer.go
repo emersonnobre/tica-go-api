@@ -1,8 +1,8 @@
 package usecases
 
 import (
-	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/emersonnobre/tica-api-go/internal/core/repositories"
 	"github.com/emersonnobre/tica-api-go/internal/core/usecases/types"
@@ -19,7 +19,12 @@ func NewRemoveCustomerUseCase(repository repositories.CustomerRepository) *Remov
 }
 
 func (u *RemoveCustomerUseCase) Execute(id int) types.UseCaseResponse {
-	count, _ := u.repository.GetCount(fmt.Sprintf("WHERE active = TRUE AND id = %d", id))
+	var filters []repositories.Filter = []repositories.Filter{
+		*repositories.NewFilter("active", "TRUE", "boolean", false),
+		*repositories.NewFilter("id", strconv.Itoa(id), "integer", false),
+	}
+
+	count, _ := u.repository.GetCount(filters)
 	if count == 0 {
 		message, errorName := "Cliente não encontrado!", types.GetNotFoundErrorName()
 		return types.NewUseCaseResponse(nil, &errorName, &message)

@@ -18,8 +18,8 @@ func NewGetCustomersUseCase(repository repositories.CustomerRepository) *GetCust
 	}
 }
 
-func (u *GetCustomersUseCase) Execute(limit int, offset int, orderBy string, order string) types.UseCaseResponse {
-	customers, err := u.repository.Get(limit, offset, orderBy, order)
+func (u *GetCustomersUseCase) Execute(limit int, offset int, orderBy string, order string, filters []repositories.Filter) types.UseCaseResponse {
+	customers, err := u.repository.Get(limit, offset, orderBy, order, filters)
 
 	if err != nil {
 		log.Println("ERROR:", err)
@@ -27,7 +27,7 @@ func (u *GetCustomersUseCase) Execute(limit int, offset int, orderBy string, ord
 		return types.NewUseCaseResponse(nil, &errorName, &message)
 	}
 
-	totalCount, _ := u.repository.GetCount("WHERE active = TRUE")
+	totalCount, _ := u.repository.GetCount(filters)
 	response := responses.NewPaginatedResponse(customers, (offset/limit)+1, limit, totalCount)
 	return types.NewUseCaseResponse(response, nil, nil)
 }

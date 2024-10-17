@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/emersonnobre/tica-api-go/internal/core/domain"
+	"github.com/emersonnobre/tica-api-go/internal/core/repositories"
 	"github.com/emersonnobre/tica-api-go/internal/core/usecases"
 	"github.com/emersonnobre/tica-api-go/internal/delivery/fiber/util"
 	"github.com/gofiber/fiber/v2"
@@ -61,8 +62,22 @@ func (h *CustomerHandler) Get(ctx *fiber.Ctx) error {
 	offset, _ := strconv.Atoi(ctx.Query("offset", "0"))
 	orderBy := ctx.Query("order_by", "name")
 	order := ctx.Query("order", "asc")
+	name := ctx.Query("name")
+	cpf := ctx.Query("cpf")
 
-	response := h.getCustomersUseCase.Execute(limit, offset, orderBy, order)
+	var filters []repositories.Filter = []repositories.Filter{
+		*repositories.NewFilter("active", "TRUE", "boolean", false),
+	}
+
+	if name != "" {
+		filters = append(filters, *repositories.NewFilter("name", name, "string", true))
+	}
+
+	if cpf != "" {
+		filters = append(filters, *repositories.NewFilter("cpf", cpf, "string", true))
+	}
+
+	response := h.getCustomersUseCase.Execute(limit, offset, orderBy, order, filters)
 	if response.ErrorName != nil {
 		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
 	}
