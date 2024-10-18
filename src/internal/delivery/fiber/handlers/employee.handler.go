@@ -31,6 +31,19 @@ func (h *EmployeeHandler) RegisterRoutes(app *fiber.App) {
 	group.Get("/:id", h.GetById)
 }
 
+//	    CreateEmployee godoc
+//
+//		@Summary        Criar um novo funcionário
+//		@Description    Cria um novo funcionário.
+//		@Description    Campos obrigatórios: nome e CPF.
+//		@Tags           employees
+//		@Accept         json
+//		@Produce        json
+//		@Param          employee  body      domain.Employee  true    "Funcionário a ser criado"
+//		@Success        201 	{string}	string	 	"Funcionário criado com sucesso"
+//		@Failure        400 	{string}	string	 	"Erro de validação"
+//		@Failure        500 	{string}	string	 	"Erro interno do sistema"
+//		@Router         /employees [post]
 func (h *EmployeeHandler) Create(ctx *fiber.Ctx) error {
 	var employee domain.Employee
 	if err := ctx.BodyParser(&employee); err != nil {
@@ -43,6 +56,18 @@ func (h *EmployeeHandler) Create(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(http.StatusCreated)
 }
 
+//	    GetEmployeeById godoc
+//
+//		@Summary        Obter um funcionário
+//		@Description    Obtém um funcionário por id.
+//		@Tags           employees
+//		@Produce        json
+//		@Param          id  		path       integer true "Id do funcionário a ser obtido"
+//		@Success        200 		{object}   domain.Employee 	"O funcionário encontrado"
+//		@Failure        400 		{string}   string	 		"Erro de validação"
+//		@Failure        404 		{string}   string	 		"Cliente não encontrado"
+//		@Failure        500 		{string}   string	 		"Erro interno do sistema"
+//		@Router         /employees/{id} [get]
 func (h *EmployeeHandler) GetById(ctx *fiber.Ctx) error {
 	id, err := strconv.Atoi(ctx.Params("id"))
 

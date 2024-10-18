@@ -29,15 +29,17 @@ func (h *CategoryHandler) RegisterRoutes(app *fiber.App) {
 	group.Get("/", h.Get)
 }
 
-// Create godoc
+// CreateCategory godoc
 //
 //	@Summary        Criar uma categoria
-//	@Description    Cria uma nova categoria.
+//	@Description    Cria uma nova categoria de produtos.
 //	@Tags           categories
 //	@Accept         json
 //	@Produce        json
-//	@Param          category  body        domain.Category  true    "Categoria a ser criada"
-//	@Success        201      "Categoria criada com sucesso"
+//	@Param          category  body      domain.Category  true    "Categoria a ser criada"
+//	@Success        201 	{string}	string	 	"Categoria criada com sucesso"
+//	@Failure        400 	{string}	string	 	"Erro de validação"
+//	@Failure        500 	{string}	string	 	"Erro interno do sistema"
 //	@Router         /categories [post]
 func (h *CategoryHandler) Create(ctx *fiber.Ctx) error {
 	var category domain.Category
@@ -59,8 +61,8 @@ func (h *CategoryHandler) Create(ctx *fiber.Ctx) error {
 //		@Description    Obtém todas as categorias sem filtro ou ordenação.
 //		@Tags           categories
 //		@Produce        json
-//		@Success        200 {array}	domain.Category "Uma lista de categorias"
-//	    @Failure        500 "Erro interno do sistema"
+//		@Success        200 	{array}		domain.Category 	"Uma lista de categorias"
+//	    @Failure        500 	{string} 	string 				"Erro interno do sistema"
 //		@Router         /categories [get]
 func (h *CategoryHandler) Get(ctx *fiber.Ctx) error {
 	response := h.getCategoriesUseCase.Execute()

@@ -1,6 +1,12 @@
-run-dev:
+run-swagger:
 	cd src
 	swag init --dir src --output src/docs
+
+run-dev:
+	@echo "Iniciando servidor"
+	cd src
+	swag init --dir src --output src/docs
+	go run src/main.go development
 run-prod:
 	go run src/main.go production
 
