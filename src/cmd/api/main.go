@@ -50,4 +50,10 @@ func setupDependencies(app *fiber.App, connection *sql.DB) {
 	removeCustomerUseCase := usecases.NewRemoveCustomerUseCase(customerRepository)
 	customerHandler := handlers.NewCustomerHandler(createCustomerUseCase, getCustomerUseCase, updateCustomerUseCase, removeCustomerUseCase, getCustomersUseCase)
 	customerHandler.RegisterRoutes(app)
+
+	// product dependencies
+	productRepository := mysql_repository.NewMySQLProductRepository(connection)
+	createProductUseCase := usecases.NewCreateProductUseCase(productRepository)
+	productHandler := handlers.NewProductHandler(createProductUseCase)
+	productHandler.RegisterRoutes(app)
 }

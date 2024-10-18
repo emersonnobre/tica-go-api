@@ -25,6 +25,6 @@ migrate-prod-down:
 	go run src/cmd/migrate/main.go production down
 
 generate-json:
-	./scripts/create_json/run -file internal/core/domain/$(filter-out $@,$(MAKECMDGOALS))
+	./src/scripts/create_json/run -file src/internal/core/domain/$(filter-out $@,$(MAKECMDGOALS))
 generate-sql-table:
-	./scripts/create_table/run -file internal/core/domain/$(filter-out $@,$(MAKECMDGOALS))
+	./src/scripts/create_table/run -file src/internal/core/domain/$(filter-out $@,$(MAKECMDGOALS))

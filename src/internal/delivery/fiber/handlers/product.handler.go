@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/emersonnobre/tica-api-go/src/internal/core/domain"
 	"github.com/emersonnobre/tica-api-go/src/internal/core/usecases"
+	"github.com/emersonnobre/tica-api-go/src/internal/core/usecases/types/requests"
 	"github.com/emersonnobre/tica-api-go/src/internal/delivery/fiber/util"
 	"github.com/gofiber/fiber/v2"
 )
@@ -23,8 +23,21 @@ func (h *ProductHandler) RegisterRoutes(app *fiber.App) {
 	group.Post("/", h.Create)
 }
 
+//	    CreateProduct godoc
+//
+//		@Summary        Criar um novo produto
+//		@Description    Cria um novo produto.
+//		@Description    Campos obrigatórios: nome e CPF.
+//		@Tags           products
+//		@Accept         json
+//		@Produce        json
+//		@Param          employee  body      requests.CreateProductRequest  true    "Produto a ser criado"
+//		@Success        201 	{string}	string	 	"Produto criado com sucesso"
+//		@Failure        400 	{string}	string	 	"Erro de validação"
+//		@Failure        500 	{string}	string	 	"Erro interno do sistema"
+//		@Router         /products [post]
 func (h *ProductHandler) Create(ctx *fiber.Ctx) error {
-	var product domain.Product
+	var product requests.CreateProductRequest
 	if err := ctx.BodyParser(&product); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).SendString("Error parsing the request json")
 	}

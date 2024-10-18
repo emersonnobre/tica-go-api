@@ -435,6 +435,52 @@
                     }
                 }
             }
+        },
+        "/products": {
+            "post": {
+                "description": "Cria um novo produto.\nCampos obrigatórios: nome e CPF.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Criar um novo produto",
+                "parameters": [
+                    {
+                        "description": "Produto a ser criado",
+                        "name": "employee",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.CreateProductRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Produto criado com sucesso",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do sistema",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -521,6 +567,32 @@
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "requests.CreateProductRequest": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "is_feedstock": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "purchase_price": {
+                    "type": "number"
+                },
+                "sale_price": {
+                    "type": "number"
+                },
+                "stock": {
+                    "type": "integer"
                 }
             }
         }

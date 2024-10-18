@@ -56,6 +56,23 @@ definitions:
       name:
         type: string
     type: object
+  requests.CreateProductRequest:
+    properties:
+      category_id:
+        type: integer
+      created_by:
+        type: integer
+      is_feedstock:
+        type: boolean
+      name:
+        type: string
+      purchase_price:
+        type: number
+      sale_price:
+        type: number
+      stock:
+        type: integer
+    type: object
 host: localhost:3000
 info:
   contact: {}
@@ -362,6 +379,38 @@ paths:
       summary: Obter um funcionário
       tags:
       - employees
+  /products:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Cria um novo produto.
+        Campos obrigatórios: nome e CPF.
+      parameters:
+      - description: Produto a ser criado
+        in: body
+        name: employee
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Produto criado com sucesso
+          schema:
+            type: string
+        "400":
+          description: Erro de validação
+          schema:
+            type: string
+        "500":
+          description: Erro interno do sistema
+          schema:
+            type: string
+      summary: Criar um novo produto
+      tags:
+      - products
 schemes:
 - http
 - https
