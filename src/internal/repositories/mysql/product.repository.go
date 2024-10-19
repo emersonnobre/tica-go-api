@@ -2,8 +2,11 @@ package mysql_repository
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/emersonnobre/tica-api-go/src/internal/core/domain"
+	"github.com/emersonnobre/tica-api-go/src/internal/core/repositories"
+	"github.com/emersonnobre/tica-api-go/src/internal/repositories/mysql/util"
 )
 
 type MySQLProductRepository struct {
@@ -30,4 +33,14 @@ func (r *MySQLProductRepository) Create(product domain.Product) error {
 	}
 
 	return nil
+}
+
+func (r *MySQLProductRepository) GetCount(filters []repositories.Filter) (int, error) {
+	var count int
+	query := fmt.Sprintf("SELECT COUNT(*) FROM products %s", util.BuildConditionsString(filters))
+	row := r.db.QueryRow(query)
+	if err := row.Scan(&count); err != nil {
+		return 0, err
+	}
+	return count, nil
 }

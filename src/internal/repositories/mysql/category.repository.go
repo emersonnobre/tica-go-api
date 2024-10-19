@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/emersonnobre/tica-api-go/src/internal/core/domain"
+	"github.com/emersonnobre/tica-api-go/src/internal/core/repositories"
+	"github.com/emersonnobre/tica-api-go/src/internal/repositories/mysql/util"
 )
 
 type MySQLCategoryRepository struct {
@@ -68,4 +70,14 @@ func (r *MySQLCategoryRepository) GetByName(description string) (*domain.Categor
 		return nil, err
 	}
 	return &category, nil
+}
+
+func (r *MySQLCategoryRepository) GetCount(filters []repositories.Filter) (int, error) {
+	var count int
+	query := fmt.Sprintf("SELECT COUNT(*) FROM categories %s", util.BuildConditionsString(filters))
+	row := r.db.QueryRow(query)
+	if err := row.Scan(&count); err != nil {
+		return 0, err
+	}
+	return count, nil
 }

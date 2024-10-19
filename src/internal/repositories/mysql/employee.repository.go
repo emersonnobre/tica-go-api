@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/emersonnobre/tica-api-go/src/internal/core/domain"
+	"github.com/emersonnobre/tica-api-go/src/internal/core/repositories"
+	"github.com/emersonnobre/tica-api-go/src/internal/repositories/mysql/util"
 )
 
 type MySQLEmployeeRepository struct {
@@ -59,4 +61,14 @@ func (r *MySQLEmployeeRepository) GetByCPF(cpf string) (*domain.Employee, error)
 		return nil, err
 	}
 	return &employee, nil
+}
+
+func (r *MySQLEmployeeRepository) GetCount(filters []repositories.Filter) (int, error) {
+	var count int
+	query := fmt.Sprintf("SELECT COUNT(*) FROM employees %s", util.BuildConditionsString(filters))
+	row := r.db.QueryRow(query)
+	if err := row.Scan(&count); err != nil {
+		return 0, err
+	}
+	return count, nil
 }

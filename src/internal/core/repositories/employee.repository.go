@@ -8,4 +8,5 @@ type EmployeeRepository interface {
 	Create(domain.Employee) error
 	GetByCPF(string) (*domain.Employee, error)
 	GetById(int) (*domain.Employee, error)
+	GetCount(filters []Filter) (int, error)
 }

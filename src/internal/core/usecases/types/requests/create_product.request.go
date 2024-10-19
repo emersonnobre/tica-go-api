@@ -27,7 +27,7 @@ func (r *CreateProductRequest) MapForDomain() *domain.Product {
 	}
 }
 
-func (r *CreateProductRequest) Validate() *[]string {
+func (r *CreateProductRequest) ValidateObjectData() *[]string {
 	validations := []domain_validators.ProductValidator{
 		domain_validators.ProductNameValidator{},
 		domain_validators.ProductPurchasePriceValidator{},
