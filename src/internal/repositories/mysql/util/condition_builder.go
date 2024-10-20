@@ -22,13 +22,11 @@ func BuildConditionsString(filters []repositories.Filter) string {
 }
 
 func transformToSqlValue(filter repositories.Filter) string {
-	switch filter.Type {
-	case "string":
+	if filter.IsString {
 		if filter.Partial {
 			return fmt.Sprintf("'%%%s%%'", filter.Value)
 		}
 		return fmt.Sprintf("'%s'", filter.Value)
-	default:
-		return filter.Value
 	}
+	return filter.Value
 }

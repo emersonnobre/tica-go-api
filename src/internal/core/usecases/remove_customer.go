@@ -20,8 +20,8 @@ func NewRemoveCustomerUseCase(repository repositories.CustomerRepository) *Remov
 
 func (u *RemoveCustomerUseCase) Execute(id int) types.UseCaseResponse {
 	var filters []repositories.Filter = []repositories.Filter{
-		*repositories.NewFilter("active", "TRUE", "boolean", false),
-		*repositories.NewFilter("id", strconv.Itoa(id), "integer", false),
+		*repositories.NewFilter("active", "TRUE", false, false),
+		*repositories.NewFilter("id", strconv.Itoa(id), false, false),
 	}
 
 	count, _ := u.repository.GetCount(filters)

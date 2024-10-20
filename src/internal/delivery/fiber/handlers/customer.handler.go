@@ -104,15 +104,15 @@ func (h *CustomerHandler) Get(ctx *fiber.Ctx) error {
 	cpf := ctx.Query("cpf")
 
 	var filters []repositories.Filter = []repositories.Filter{
-		*repositories.NewFilter("active", "TRUE", "boolean", false),
+		*repositories.NewFilter("active", "TRUE", false, false),
 	}
 
 	if name != "" {
-		filters = append(filters, *repositories.NewFilter("name", name, "string", true))
+		filters = append(filters, *repositories.NewFilter("name", name, true, true))
 	}
 
 	if cpf != "" {
-		filters = append(filters, *repositories.NewFilter("cpf", cpf, "string", true))
+		filters = append(filters, *repositories.NewFilter("cpf", cpf, true, true))
 	}
 
 	response := h.getCustomersUseCase.Execute(limit, offset, orderBy, order, filters)
