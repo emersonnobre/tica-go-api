@@ -46,7 +46,8 @@ func (r *MySQLProductRepository) GetCount(filters []repositories.Filter) (int, e
 }
 
 func (r *MySQLProductRepository) GetById(id int) (*domain.Product, error) {
-	var product domain.Product
+	product := domain.NewEmptyProduct()
+
 	query := fmt.Sprintf(`
 		SELECT p.id,
 					 p.name,
@@ -57,7 +58,8 @@ func (r *MySQLProductRepository) GetById(id int) (*domain.Product, error) {
 					 p.active,
 					 p.created_at,
 					 p.updated_at,
-					 p.is_feedstock
+					 p.is_feedstock,
+					 p.category_id
 		FROM products p
 		WHERE p.id = %d
 	`, id)
@@ -65,7 +67,7 @@ func (r *MySQLProductRepository) GetById(id int) (*domain.Product, error) {
 	if row == nil {
 		return nil, nil
 	}
-	row.Scan(
+	err := row.Scan(
 		&product.Id,
 		&product.Name,
 		&product.PurchasePrice,
@@ -75,11 +77,30 @@ func (r *MySQLProductRepository) GetById(id int) (*domain.Product, error) {
 		&product.Active,
 		&product.CreatedAt,
 		&product.UpdatedAt,
-		&product.IsFeedstock)
-	return &product, nil
+		&product.IsFeedstock,
+		&product.Category.Id,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	query = fmt.Sprintf("SELECT description FROM categories where id = %d", product.Category.Id)
+	row = r.db.QueryRow(query)
+	row.Scan(&product.Category.Description)
+
+	return product, nil
 }
 
 func (r *MySQLProductRepository) Update(product *domain.Product) error {
+	var isFeedstock string
+	if product.IsFeedstock {
+		isFeedstock = "True"
+	} else {
+		isFeedstock = "False"
+	}
 	_, err := r.db.Exec(fmt.Sprintf(`
 		UPDATE products
 		SET name = '%s',
@@ -88,8 +109,8 @@ func (r *MySQLProductRepository) Update(product *domain.Product) error {
 				stock = %d,
 				category_id = %d,
 				updated_by = %d,
-				updated_at = %s,
-				is_feedstock = %t
+				updated_at = '%s',
+				is_feedstock = %s
 		WHERE id = %d
 	`, product.Name,
 		product.PurchasePrice,
@@ -97,8 +118,8 @@ func (r *MySQLProductRepository) Update(product *domain.Product) error {
 		product.Stock,
 		product.Category.Id,
 		product.UpdatedBy.Id,
-		product.UpdatedAt,
-		product.IsFeedstock,
+		product.UpdatedAt.Format("2006-01-02 15:04:05"),
+		isFeedstock,
 		product.Id,
 	))
 

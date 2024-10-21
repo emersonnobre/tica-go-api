@@ -19,3 +19,11 @@ type Product struct {
 	UpdatedBy     *Employee  `json:"updated_by"`
 	IsFeedstock   bool       `json:"is_feedstock"`
 }
+
+func NewEmptyProduct() *Product {
+	var product Product
+	product.Category = &Category{}
+	product.CreatedBy = &Employee{}
+	product.UpdatedBy = &Employee{}
+	return &product
+}

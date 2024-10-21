@@ -483,6 +483,98 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/products/{id}": {
+            "get": {
+                "description": "Obtém um produto pelo id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Obter um produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id do produto a ser obtido",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Produto encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Product"
+                        }
+                    },
+                    "404": {
+                        "description": "Produto não encontrado",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do sistema",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza um produto pelo id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Atualizar produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id do produto a ser atualizado",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Informações para atualizar",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.UpdateProductRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Produto atualizado com sucesso"
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do sistema",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -572,6 +664,47 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.Product": {
+            "type": "object",
+            "properties": {
+                "barcode": {
+                    "type": "string"
+                },
+                "category": {
+                    "$ref": "#/definitions/domain.Category"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "$ref": "#/definitions/domain.Employee"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_feedstock": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "purchase_price": {
+                    "type": "number"
+                },
+                "sale_price": {
+                    "type": "number"
+                },
+                "stock": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "$ref": "#/definitions/domain.Employee"
+                }
+            }
+        },
         "requests.CreateProductRequest": {
             "type": "object",
             "properties": {
@@ -594,6 +727,35 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "requests.UpdateProductRequest": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_feedstock": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "purchase_price": {
+                    "type": "number"
+                },
+                "sale_price": {
+                    "type": "number"
+                },
+                "stock": {
+                    "type": "integer"
+                },
+                "updated_by": {
                     "type": "integer"
                 }
             }

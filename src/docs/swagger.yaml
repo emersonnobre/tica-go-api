@@ -56,6 +56,33 @@ definitions:
       name:
         type: string
     type: object
+  domain.Product:
+    properties:
+      barcode:
+        type: string
+      category:
+        $ref: '#/definitions/domain.Category'
+      created_at:
+        type: string
+      created_by:
+        $ref: '#/definitions/domain.Employee'
+      id:
+        type: integer
+      is_feedstock:
+        type: boolean
+      name:
+        type: string
+      purchase_price:
+        type: number
+      sale_price:
+        type: number
+      stock:
+        type: integer
+      updated_at:
+        type: string
+      updated_by:
+        $ref: '#/definitions/domain.Employee'
+    type: object
   requests.CreateProductRequest:
     properties:
       category_id:
@@ -71,6 +98,25 @@ definitions:
       sale_price:
         type: number
       stock:
+        type: integer
+    type: object
+  requests.UpdateProductRequest:
+    properties:
+      category_id:
+        type: integer
+      id:
+        type: integer
+      is_feedstock:
+        type: boolean
+      name:
+        type: string
+      purchase_price:
+        type: number
+      sale_price:
+        type: number
+      stock:
+        type: integer
+      updated_by:
         type: integer
     type: object
 host: localhost:3000
@@ -409,6 +455,67 @@ paths:
           schema:
             type: string
       summary: Criar um novo produto
+      tags:
+      - products
+  /products/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtém um produto pelo id.
+      parameters:
+      - description: Id do produto a ser obtido
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Produto encontrado
+          schema:
+            $ref: '#/definitions/domain.Product'
+        "404":
+          description: Produto não encontrado
+          schema:
+            type: string
+        "500":
+          description: Erro interno do sistema
+          schema:
+            type: string
+      summary: Obter um produto
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Atualiza um produto pelo id.
+      parameters:
+      - description: Id do produto a ser atualizado
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Informações para atualizar
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Produto atualizado com sucesso
+        "400":
+          description: Erro de validação
+          schema:
+            type: string
+        "500":
+          description: Erro interno do sistema
+          schema:
+            type: string
+      summary: Atualizar produto
       tags:
       - products
 schemes:
