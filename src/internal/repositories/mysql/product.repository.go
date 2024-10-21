@@ -144,3 +144,39 @@ func (r *MySQLProductRepository) Delete(id int) error {
 	}
 	return nil
 }
+
+func (r *MySQLProductRepository) Get(limit int, offset int, orderBy string, order string, filters []repositories.Filter) ([]domain.Product, error) {
+	query := fmt.Sprintf(`
+		SELECT id, name, stock, category_id, created_at, is_feedstock 
+		FROM products
+		%s 
+		ORDER BY %s %s 
+		LIMIT %d OFFSET %d
+	`, util.BuildConditionsString(filters), orderBy, order, limit, offset)
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var products []domain.Product
+	for rows.Next() {
+		product := domain.NewEmptyProduct()
+		err := rows.Scan(&product.Id, &product.Name, &product.Stock, &product.Category.Id, &product.CreatedAt, &product.IsFeedstock)
+		if err != nil {
+			return nil, err
+		}
+
+		query = fmt.Sprintf("SELECT description FROM categories WHERE id = %d", product.Category.Id)
+		row := r.db.QueryRow(query)
+		row.Scan(&product.Category.Description)
+		products = append(products, *product)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}

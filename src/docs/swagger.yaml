@@ -119,6 +119,21 @@ definitions:
       updated_by:
         type: integer
     type: object
+  responses.ProductResponse:
+    properties:
+      category:
+        $ref: '#/definitions/domain.Category'
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_feedstock:
+        type: boolean
+      name:
+        type: string
+      stock:
+        type: integer
+    type: object
 host: localhost:3000
 info:
   contact: {}
@@ -426,12 +441,72 @@ paths:
       tags:
       - employees
   /products:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Obtém uma lista de produtos paginada.
+        Requisitos funcionais relacionados: 2B.
+        Filtros disponíveis: name (nome), is_feedstock (se é matéria prima), category_id (id da categoria).
+        Campos disponíveis para ordenação (em inglês): name e created_at (orderBy)
+        Para ordenação, pode ser utilizado o mecanismo ascendente e descendente (ASC e DESC) (order)
+        offset: utilizado para paginação, define a quantidade de itens a serem "pulados".
+        limit: utilizado para paginação, define a quantidade máxima de itens a serem obtidos.
+      parameters:
+      - description: Limite de itens a serem obtidos
+        in: query
+        name: limit
+        type: integer
+      - description: Quantidade de itens a serem pulados
+        in: query
+        name: offset
+        type: integer
+      - description: Nome do campo para ordenação (name, created_at)
+        in: query
+        name: order_by
+        type: string
+      - description: ASC ou DESC para ordenação
+        in: query
+        name: order
+        type: string
+      - description: Nome para filtro
+        in: query
+        name: name
+        type: string
+      - description: Se é matéria prima ou não para filtro (True ou False)
+        in: query
+        name: is_feedstock
+        type: string
+      - description: Id da categoria do produto para filtro
+        in: query
+        name: category_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Uma lista de produtos
+          schema:
+            items:
+              $ref: '#/definitions/responses.ProductResponse'
+            type: array
+        "400":
+          description: Erro de validação
+          schema:
+            type: string
+        "500":
+          description: Erro interno do sistema
+          schema:
+            type: string
+      summary: Obter uma lista de produtos paginada, ordenada e filtrada
+      tags:
+      - products
     post:
       consumes:
       - application/json
       description: |-
         Cria um novo produto.
-        Campos obrigatórios: nome e CPF.
+        Requisitos funcionais relacionados: 2A.
       parameters:
       - description: Produto a ser criado
         in: body
@@ -461,7 +536,9 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Deleta um produto pelo id.
+      description: |-
+        Deleta um produto pelo id.
+        Requisitos funcionais relacionados: 2D.
       parameters:
       - description: Id do produto a ser deletado
         in: path
@@ -491,7 +568,9 @@ paths:
     get:
       consumes:
       - application/json
-      description: Obtém um produto pelo id.
+      description: |-
+        Obtém um produto pelo id.
+        Requisitos funcionais relacionados: 2G.
       parameters:
       - description: Id do produto a ser obtido
         in: path
@@ -519,7 +598,9 @@ paths:
     put:
       consumes:
       - application/json
-      description: Atualiza um produto pelo id.
+      description: |-
+        Atualiza um produto pelo id.
+        Requisitos funcionais relacionados: 2C.
       parameters:
       - description: Id do produto a ser atualizado
         in: path

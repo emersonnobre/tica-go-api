@@ -437,8 +437,88 @@
             }
         },
         "/products": {
+            "get": {
+                "description": "Obtém uma lista de produtos paginada.\nRequisitos funcionais relacionados: 2B.\nFiltros disponíveis: name (nome), is_feedstock (se é matéria prima), category_id (id da categoria).\nCampos disponíveis para ordenação (em inglês): name e created_at (orderBy)\nPara ordenação, pode ser utilizado o mecanismo ascendente e descendente (ASC e DESC) (order)\noffset: utilizado para paginação, define a quantidade de itens a serem \"pulados\".\nlimit: utilizado para paginação, define a quantidade máxima de itens a serem obtidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Obter uma lista de produtos paginada, ordenada e filtrada",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limite de itens a serem obtidos",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Quantidade de itens a serem pulados",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Nome do campo para ordenação (name, created_at)",
+                        "name": "order_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "ASC ou DESC para ordenação",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Nome para filtro",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Se é matéria prima ou não para filtro (True ou False)",
+                        "name": "is_feedstock",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Id da categoria do produto para filtro",
+                        "name": "category_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Uma lista de produtos",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.ProductResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do sistema",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "post": {
-                "description": "Cria um novo produto.\nCampos obrigatórios: nome e CPF.",
+                "description": "Cria um novo produto.\nRequisitos funcionais relacionados: 2A.",
                 "consumes": [
                     "application/json"
                 ],
@@ -484,7 +564,7 @@
         },
         "/products/{id}": {
             "get": {
-                "description": "Obtém um produto pelo id.",
+                "description": "Obtém um produto pelo id.\nRequisitos funcionais relacionados: 2G.",
                 "consumes": [
                     "application/json"
                 ],
@@ -526,7 +606,7 @@
                 }
             },
             "put": {
-                "description": "Atualiza um produto pelo id.",
+                "description": "Atualiza um produto pelo id.\nRequisitos funcionais relacionados: 2C.",
                 "consumes": [
                     "application/json"
                 ],
@@ -574,7 +654,7 @@
                 }
             },
             "delete": {
-                "description": "Deleta um produto pelo id.",
+                "description": "Deleta um produto pelo id.\nRequisitos funcionais relacionados: 2D.",
                 "consumes": [
                     "application/json"
                 ],
@@ -799,6 +879,29 @@
                     "type": "integer"
                 },
                 "updated_by": {
+                    "type": "integer"
+                }
+            }
+        },
+        "responses.ProductResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "$ref": "#/definitions/domain.Category"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_feedstock": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "stock": {
                     "type": "integer"
                 }
             }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"strconv"
 
+	"github.com/emersonnobre/tica-api-go/src/internal/core/repositories"
 	"github.com/emersonnobre/tica-api-go/src/internal/core/usecases"
 	"github.com/emersonnobre/tica-api-go/src/internal/core/usecases/types/requests"
 	"github.com/emersonnobre/tica-api-go/src/internal/delivery/fiber/util"
@@ -14,6 +15,7 @@ type ProductHandler struct {
 	updateProductUseCase *usecases.UpdateProductUseCase
 	getProductUseCase    *usecases.GetProductUseCase
 	removeProductUseCase *usecases.RemoveProductUseCase
+	getProductsUseCase   *usecases.GetProductsUseCase
 }
 
 func NewProductHandler(
@@ -21,12 +23,14 @@ func NewProductHandler(
 	updateProductUseCase *usecases.UpdateProductUseCase,
 	getProductUseCase *usecases.GetProductUseCase,
 	removeProductUseCase *usecases.RemoveProductUseCase,
+	getProductsUseCase *usecases.GetProductsUseCase,
 ) *ProductHandler {
 	return &ProductHandler{
 		createProductUseCase: createProductUseCase,
 		updateProductUseCase: updateProductUseCase,
 		getProductUseCase:    getProductUseCase,
 		removeProductUseCase: removeProductUseCase,
+		getProductsUseCase:   getProductsUseCase,
 	}
 }
 
@@ -34,6 +38,7 @@ func (h *ProductHandler) RegisterRoutes(app *fiber.App) {
 	group := app.Group("/products")
 
 	group.Post("/", h.Create)
+	group.Get("/", h.Get)
 	group.Put("/:id", h.Update)
 	group.Get("/:id", h.GetById)
 	group.Delete("/:id", h.Delete)
@@ -43,7 +48,7 @@ func (h *ProductHandler) RegisterRoutes(app *fiber.App) {
 //
 //		@Summary        Criar um novo produto
 //		@Description    Cria um novo produto.
-//		@Description    Campos obrigatórios: nome e CPF.
+//		@Description    Requisitos funcionais relacionados: 2A.
 //		@Tags           products
 //		@Accept         json
 //		@Produce        json
@@ -68,6 +73,7 @@ func (h *ProductHandler) Create(ctx *fiber.Ctx) error {
 //
 //		@Summary        Atualizar produto
 //		@Description    Atualiza um produto pelo id.
+//		@Description    Requisitos funcionais relacionados: 2C.
 //		@Tags           products
 //		@Accept         json
 //		@Produce        json
@@ -101,6 +107,7 @@ func (h *ProductHandler) Update(ctx *fiber.Ctx) error {
 //
 //		@Summary        Obter um produto
 //		@Description    Obtém um produto pelo id.
+//		@Description    Requisitos funcionais relacionados: 2G.
 //		@Tags           products
 //		@Accept         json
 //		@Produce        json
@@ -127,6 +134,7 @@ func (h *ProductHandler) GetById(ctx *fiber.Ctx) error {
 //
 //		@Summary        Deleta um produto
 //		@Description    Deleta um produto pelo id.
+//		@Description    Requisitos funcionais relacionados: 2D.
 //		@Tags           products
 //		@Accept         json
 //		@Produce        json
@@ -148,4 +156,67 @@ func (h *ProductHandler) Delete(ctx *fiber.Ctx) error {
 		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
 	}
 	return ctx.SendStatus(fiber.StatusNoContent)
+}
+
+//	    GetProducts godoc
+//
+//		@Summary        Obter uma lista de produtos paginada, ordenada e filtrada
+//		@Description    Obtém uma lista de produtos paginada.
+//		@Description    Requisitos funcionais relacionados: 2B.
+//		@Description    Filtros disponíveis: name (nome), is_feedstock (se é matéria prima), category_id (id da categoria).
+//		@Description    Campos disponíveis para ordenação (em inglês): name e created_at (orderBy)
+//		@Description    Para ordenação, pode ser utilizado o mecanismo ascendente e descendente (ASC e DESC) (order)
+//		@Description    offset: utilizado para paginação, define a quantidade de itens a serem "pulados".
+//		@Description    limit: utilizado para paginação, define a quantidade máxima de itens a serem obtidos.
+//		@Tags           products
+//		@Accept         json
+//		@Produce        json
+//		@Param          limit  			query      integer false "Limite de itens a serem obtidos"
+//		@Param          offset  		query      integer false "Quantidade de itens a serem pulados"
+//		@Param          order_by  		query      string  false "Nome do campo para ordenação (name, created_at)"
+//		@Param          order  			query      string  false "ASC ou DESC para ordenação"
+//		@Param          name  			query      string  false "Nome para filtro"
+//		@Param          is_feedstock  	query      string  false "Se é matéria prima ou não para filtro (True ou False)"
+//		@Param          category_id  	query      integer false "Id da categoria do produto para filtro"
+//		@Success        200 		{array}	   responses.ProductResponse	"Uma lista de produtos"
+//		@Success        400 		{string}   string	 					"Erro de validação"
+//		@Failure        500 		{string}   string	 					"Erro interno do sistema"
+//		@Router         /products [get]
+func (h *ProductHandler) Get(ctx *fiber.Ctx) error {
+	limit, _ := strconv.Atoi(ctx.Query("limit", "10"))
+	offset, _ := strconv.Atoi(ctx.Query("offset", "0"))
+	orderBy := ctx.Query("order_by", "name")
+	order := ctx.Query("order", "asc")
+	name := ctx.Query("name")
+	isFeedstock := ctx.Query("is_feedstock")
+	categoryId := ctx.Query("category_id")
+
+	var filters []repositories.Filter = []repositories.Filter{
+		*repositories.NewFilter("active", "TRUE", false, false),
+	}
+
+	if name != "" {
+		filters = append(filters, *repositories.NewFilter("name", name, true, true))
+	}
+
+	if isFeedstock != "" {
+		if isFeedstock != "True" && isFeedstock != "False" {
+			return ctx.Status(fiber.StatusBadRequest).SendString("is_feedstock deve ser True ou False!")
+		}
+		filters = append(filters, *repositories.NewFilter("is_feedstock", isFeedstock, false, false))
+	}
+
+	if categoryId != "" {
+		_, err := strconv.Atoi(categoryId)
+		if err != nil {
+			return ctx.Status(fiber.StatusBadRequest).SendString("category_id deve ser do tipo inteiro!")
+		}
+		filters = append(filters, *repositories.NewFilter("category_id", categoryId, false, false))
+	}
+
+	response := h.getProductsUseCase.Execute(limit, offset, orderBy, order, filters)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.Status(fiber.StatusOK).JSON(response.Data)
 }
