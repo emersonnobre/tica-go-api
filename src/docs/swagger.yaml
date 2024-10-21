@@ -458,6 +458,36 @@ paths:
       tags:
       - products
   /products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deleta um produto pelo id.
+      parameters:
+      - description: Id do produto a ser deletado
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Produto deletado com sucesso
+        "400":
+          description: Erro de validação
+          schema:
+            type: string
+        "404":
+          description: Produto não encontrado
+          schema:
+            type: string
+        "500":
+          description: Erro interno do sistema
+          schema:
+            type: string
+      summary: Deleta um produto
+      tags:
+      - products
     get:
       consumes:
       - application/json

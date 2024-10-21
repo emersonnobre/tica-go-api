@@ -62,6 +62,7 @@ func (r *MySQLProductRepository) GetById(id int) (*domain.Product, error) {
 					 p.category_id
 		FROM products p
 		WHERE p.id = %d
+		and active = True
 	`, id)
 	row := r.db.QueryRow(query)
 	if row == nil {
@@ -129,5 +130,17 @@ func (r *MySQLProductRepository) Update(product *domain.Product) error {
 		}
 	}
 
+	return nil
+}
+
+func (r *MySQLProductRepository) Delete(id int) error {
+	result, err := r.db.Exec(fmt.Sprintf("UPDATE products SET active = False WHERE id = %d AND active = True", id))
+	if err != nil {
+		return err
+	}
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
 	return nil
 }

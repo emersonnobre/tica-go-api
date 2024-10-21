@@ -13,17 +13,20 @@ type ProductHandler struct {
 	createProductUseCase *usecases.CreateProductUseCase
 	updateProductUseCase *usecases.UpdateProductUseCase
 	getProductUseCase    *usecases.GetProductUseCase
+	removeProductUseCase *usecases.RemoveProductUseCase
 }
 
 func NewProductHandler(
 	createProductUseCase *usecases.CreateProductUseCase,
 	updateProductUseCase *usecases.UpdateProductUseCase,
 	getProductUseCase *usecases.GetProductUseCase,
+	removeProductUseCase *usecases.RemoveProductUseCase,
 ) *ProductHandler {
 	return &ProductHandler{
 		createProductUseCase: createProductUseCase,
 		updateProductUseCase: updateProductUseCase,
 		getProductUseCase:    getProductUseCase,
+		removeProductUseCase: removeProductUseCase,
 	}
 }
 
@@ -33,6 +36,7 @@ func (h *ProductHandler) RegisterRoutes(app *fiber.App) {
 	group.Post("/", h.Create)
 	group.Put("/:id", h.Update)
 	group.Get("/:id", h.GetById)
+	group.Delete("/:id", h.Delete)
 }
 
 //	    CreateProduct godoc
@@ -117,4 +121,31 @@ func (h *ProductHandler) GetById(ctx *fiber.Ctx) error {
 		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
 	}
 	return ctx.Status(fiber.StatusOK).JSON(response.Data)
+}
+
+//	    DeleteProduct godoc
+//
+//		@Summary        Deleta um produto
+//		@Description    Deleta um produto pelo id.
+//		@Tags           products
+//		@Accept         json
+//		@Produce        json
+//		@Param          id  		path       integer true "Id do produto a ser deletado"
+//		@Success        204	  	"Produto deletado com sucesso"
+//		@Failure        404 	{string}	string	 					"Produto não encontrado"
+//		@Failure        400 	{string}	string	 					"Erro de validação"
+//		@Failure        500 	{string}	string	 					"Erro interno do sistema"
+//		@Router         /products/{id} [delete]
+func (h *ProductHandler) Delete(ctx *fiber.Ctx) error {
+	id, err := strconv.Atoi(ctx.Params("id"))
+
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
+	}
+
+	response := h.removeProductUseCase.Execute(id)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.SendStatus(fiber.StatusNoContent)
 }

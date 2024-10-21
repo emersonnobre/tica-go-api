@@ -7,4 +7,5 @@ type ProductRepository interface {
 	GetCount(filters []Filter) (int, error)
 	GetById(id int) (*domain.Product, error)
 	Update(*domain.Product) error
+	Delete(id int) error
 }

@@ -572,6 +572,51 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Deleta um produto pelo id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Deleta um produto",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id do produto a ser deletado",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Produto deletado com sucesso"
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Produto não encontrado",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do sistema",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         }
     },
