@@ -34,7 +34,7 @@ func main() {
 	app := fiber.New()
 	api.SetupAPI(app, connection)
 	app.Get("/swagger/*", swagger.HandlerDefault)
-	app.Listen(":3000")
+	log.Println(app.Listen(":3000"))
 }
 
 func pickEnvironmentFile(env string) string {
