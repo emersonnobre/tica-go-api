@@ -701,6 +701,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/products/{id}/outflow": {
+            "post": {
+                "description": "Registra a saída manual de um produto e atualiza o estoque.\nRequisitos funcionais relacionados: 2F, 2F.a.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Registrar a saída manual de um produto",
+                "parameters": [
+                    {
+                        "description": "Informações da saída para registro",
+                        "name": "outflow",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.ProductOutflow"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Saída registrada com sucesso",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Produto não encontrado",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do sistema",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/products/{id}/purchase": {
             "post": {
                 "description": "Registra a compra de um produto e atualiza o estoque.\nRequisitos funcionais relacionados: 2E, 2E.a.",
@@ -899,6 +951,23 @@ const docTemplate = `{
                 },
                 "stock": {
                     "type": "integer"
+                }
+            }
+        },
+        "requests.ProductOutflow": {
+            "type": "object",
+            "properties": {
+                "created_by": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "reason": {
+                    "type": "string"
                 }
             }
         },

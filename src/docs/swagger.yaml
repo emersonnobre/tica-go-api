@@ -100,6 +100,17 @@ definitions:
       stock:
         type: integer
     type: object
+  requests.ProductOutflow:
+    properties:
+      created_by:
+        type: integer
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      reason:
+        type: string
+    type: object
   requests.PurchaseProductRequest:
     properties:
       created_by:
@@ -638,6 +649,42 @@ paths:
           schema:
             type: string
       summary: Atualizar produto
+      tags:
+      - products
+  /products/{id}/outflow:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Registra a saída manual de um produto e atualiza o estoque.
+        Requisitos funcionais relacionados: 2F, 2F.a.
+      parameters:
+      - description: Informações da saída para registro
+        in: body
+        name: outflow
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ProductOutflow'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Saída registrada com sucesso
+          schema:
+            type: string
+        "400":
+          description: Erro de validação
+          schema:
+            type: string
+        "404":
+          description: Produto não encontrado
+          schema:
+            type: string
+        "500":
+          description: Erro interno do sistema
+          schema:
+            type: string
+      summary: Registrar a saída manual de um produto
       tags:
       - products
   /products/{id}/purchase:

@@ -11,12 +11,13 @@ import (
 )
 
 type ProductHandler struct {
-	createProductUseCase   *usecases.CreateProductUseCase
-	updateProductUseCase   *usecases.UpdateProductUseCase
-	getProductUseCase      *usecases.GetProductUseCase
-	removeProductUseCase   *usecases.RemoveProductUseCase
-	getProductsUseCase     *usecases.GetProductsUseCase
-	purchaseProductUseCase *usecases.PurchaseProductUseCase
+	createProductUseCase          *usecases.CreateProductUseCase
+	updateProductUseCase          *usecases.UpdateProductUseCase
+	getProductUseCase             *usecases.GetProductUseCase
+	removeProductUseCase          *usecases.RemoveProductUseCase
+	getProductsUseCase            *usecases.GetProductsUseCase
+	purchaseProductUseCase        *usecases.PurchaseProductUseCase
+	registerProductOutflowUseCase *usecases.RegisterProductOutflowUseCase
 }
 
 func NewProductHandler(
@@ -26,14 +27,16 @@ func NewProductHandler(
 	removeProductUseCase *usecases.RemoveProductUseCase,
 	getProductsUseCase *usecases.GetProductsUseCase,
 	purchaseProductUseCase *usecases.PurchaseProductUseCase,
+	registerProductOutflowUseCase *usecases.RegisterProductOutflowUseCase,
 ) *ProductHandler {
 	return &ProductHandler{
-		createProductUseCase:   createProductUseCase,
-		updateProductUseCase:   updateProductUseCase,
-		getProductUseCase:      getProductUseCase,
-		removeProductUseCase:   removeProductUseCase,
-		getProductsUseCase:     getProductsUseCase,
-		purchaseProductUseCase: purchaseProductUseCase,
+		createProductUseCase:          createProductUseCase,
+		updateProductUseCase:          updateProductUseCase,
+		getProductUseCase:             getProductUseCase,
+		removeProductUseCase:          removeProductUseCase,
+		getProductsUseCase:            getProductsUseCase,
+		purchaseProductUseCase:        purchaseProductUseCase,
+		registerProductOutflowUseCase: registerProductOutflowUseCase,
 	}
 }
 
@@ -46,6 +49,7 @@ func (h *ProductHandler) RegisterRoutes(app *fiber.App) {
 	group.Get("/:id", h.GetById)
 	group.Delete("/:id", h.Delete)
 	group.Post("/:id/purchase", h.Purchase)
+	group.Post("/:id/outflow", h.RegisterOutflow)
 }
 
 //	    CreateProduct godoc
@@ -244,6 +248,32 @@ func (h *ProductHandler) Purchase(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar requisição!")
 	}
 	response := h.purchaseProductUseCase.Execute(&purchase)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.SendStatus(fiber.StatusCreated)
+}
+
+//	    RegisterProductOutflow godoc
+//
+//		@Summary        Registrar a saída manual de um produto
+//		@Description    Registra a saída manual de um produto e atualiza o estoque.
+//		@Description    Requisitos funcionais relacionados: 2F, 2F.a.
+//		@Tags           products
+//		@Accept         json
+//		@Produce        json
+//		@Param          outflow  body      requests.ProductOutflow  true    "Informações da saída para registro"
+//		@Success        201 	{string}	string	 	"Saída registrada com sucesso"
+//		@Failure        404 	{string}	string	 	"Produto não encontrado"
+//		@Failure        400 	{string}	string	 	"Erro de validação"
+//		@Failure        500 	{string}	string	 	"Erro interno do sistema"
+//		@Router         /products/{id}/outflow [post]
+func (h *ProductHandler) RegisterOutflow(ctx *fiber.Ctx) error {
+	var outflow requests.ProductOutflow
+	if err := ctx.BodyParser(&outflow); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar requisição!")
+	}
+	response := h.registerProductOutflowUseCase.Execute(&outflow)
 	if response.ErrorName != nil {
 		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
 	}

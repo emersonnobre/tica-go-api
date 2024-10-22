@@ -62,6 +62,15 @@ func setupDependencies(app *fiber.App, connection *sql.DB) {
 	removeProductUseCase := usecases.NewRemoveProductUseCase(productRepository)
 	getProductsUseCase := usecases.NewGetProductsUseCase(productRepository)
 	purchaseProductUseCase := usecases.NewPurchaseProductUseCase(productRepository, transactionRepository)
-	productHandler := handlers.NewProductHandler(createProductUseCase, updateProductUseCase, getProductUseCase, removeProductUseCase, getProductsUseCase, purchaseProductUseCase)
+	registerProductOutflowUseCase := usecases.NewRegisterProductOutflowUseCase(productRepository, transactionRepository)
+	productHandler := handlers.NewProductHandler(
+		createProductUseCase,
+		updateProductUseCase,
+		getProductUseCase,
+		removeProductUseCase,
+		getProductsUseCase,
+		purchaseProductUseCase,
+		registerProductOutflowUseCase,
+	)
 	productHandler.RegisterRoutes(app)
 }
