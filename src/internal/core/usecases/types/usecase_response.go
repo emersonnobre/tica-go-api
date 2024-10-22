@@ -17,3 +17,7 @@ func NewUseCaseResponse(data any, errorName *string, errorMessage *string) UseCa
 func NewErrorUseCaseResponse(errorName string, errorMessage string) UseCaseResponse {
 	return NewUseCaseResponse(nil, &errorName, &errorMessage)
 }
+
+func NewSuccessUseCaseResponse(data any) UseCaseResponse {
+	return NewUseCaseResponse(data, nil, nil)
+}

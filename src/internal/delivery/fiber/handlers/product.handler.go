@@ -11,11 +11,12 @@ import (
 )
 
 type ProductHandler struct {
-	createProductUseCase *usecases.CreateProductUseCase
-	updateProductUseCase *usecases.UpdateProductUseCase
-	getProductUseCase    *usecases.GetProductUseCase
-	removeProductUseCase *usecases.RemoveProductUseCase
-	getProductsUseCase   *usecases.GetProductsUseCase
+	createProductUseCase   *usecases.CreateProductUseCase
+	updateProductUseCase   *usecases.UpdateProductUseCase
+	getProductUseCase      *usecases.GetProductUseCase
+	removeProductUseCase   *usecases.RemoveProductUseCase
+	getProductsUseCase     *usecases.GetProductsUseCase
+	purchaseProductUseCase *usecases.PurchaseProductUseCase
 }
 
 func NewProductHandler(
@@ -24,13 +25,15 @@ func NewProductHandler(
 	getProductUseCase *usecases.GetProductUseCase,
 	removeProductUseCase *usecases.RemoveProductUseCase,
 	getProductsUseCase *usecases.GetProductsUseCase,
+	purchaseProductUseCase *usecases.PurchaseProductUseCase,
 ) *ProductHandler {
 	return &ProductHandler{
-		createProductUseCase: createProductUseCase,
-		updateProductUseCase: updateProductUseCase,
-		getProductUseCase:    getProductUseCase,
-		removeProductUseCase: removeProductUseCase,
-		getProductsUseCase:   getProductsUseCase,
+		createProductUseCase:   createProductUseCase,
+		updateProductUseCase:   updateProductUseCase,
+		getProductUseCase:      getProductUseCase,
+		removeProductUseCase:   removeProductUseCase,
+		getProductsUseCase:     getProductsUseCase,
+		purchaseProductUseCase: purchaseProductUseCase,
 	}
 }
 
@@ -42,6 +45,7 @@ func (h *ProductHandler) RegisterRoutes(app *fiber.App) {
 	group.Put("/:id", h.Update)
 	group.Get("/:id", h.GetById)
 	group.Delete("/:id", h.Delete)
+	group.Post("/:id/purchase", h.Purchase)
 }
 
 //	    CreateProduct godoc
@@ -52,7 +56,7 @@ func (h *ProductHandler) RegisterRoutes(app *fiber.App) {
 //		@Tags           products
 //		@Accept         json
 //		@Produce        json
-//		@Param          employee  body      requests.CreateProductRequest  true    "Produto a ser criado"
+//		@Param          product  body      requests.CreateProductRequest  true    "Produto a ser criado"
 //		@Success        201 	{string}	string	 	"Produto criado com sucesso"
 //		@Failure        400 	{string}	string	 	"Erro de validação"
 //		@Failure        500 	{string}	string	 	"Erro interno do sistema"
@@ -112,7 +116,7 @@ func (h *ProductHandler) Update(ctx *fiber.Ctx) error {
 //		@Accept         json
 //		@Produce        json
 //		@Param          id  		path       integer true "Id do produto a ser obtido"
-//		@Success        200		{object}	domain.Product  	"Produto encontrado"
+//		@Success        200		{object}	domain.Product  			"Produto encontrado"
 //		@Failure        404 	{string}	string	 					"Produto não encontrado"
 //		@Failure        500 	{string}	string	 					"Erro interno do sistema"
 //		@Router         /products/{id} [get]
@@ -219,4 +223,29 @@ func (h *ProductHandler) Get(ctx *fiber.Ctx) error {
 		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
 	}
 	return ctx.Status(fiber.StatusOK).JSON(response.Data)
+}
+
+//	    PurchaseProduct godoc
+//
+//		@Summary        Registrar a compra de um produto
+//		@Description    Registra a compra de um produto e atualiza o estoque.
+//		@Description    Requisitos funcionais relacionados: 2E, 2E.a.
+//		@Tags           products
+//		@Accept         json
+//		@Produce        json
+//		@Param          product  body      requests.PurchaseProductRequest  true    "Informações da compra para registro"
+//		@Success        201 	{string}	string	 	"Compra registrada com sucesso"
+//		@Failure        400 	{string}	string	 	"Erro de validação"
+//		@Failure        500 	{string}	string	 	"Erro interno do sistema"
+//		@Router         /products/{id}/purchase [post]
+func (h *ProductHandler) Purchase(ctx *fiber.Ctx) error {
+	var purchase requests.PurchaseProductRequest
+	if err := ctx.BodyParser(&purchase); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar requisição!")
+	}
+	response := h.purchaseProductUseCase.Execute(&purchase)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.SendStatus(fiber.StatusCreated)
 }

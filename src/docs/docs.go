@@ -534,7 +534,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Produto a ser criado",
-                        "name": "employee",
+                        "name": "product",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -700,6 +700,52 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/products/{id}/purchase": {
+            "post": {
+                "description": "Registra a compra de um produto e atualiza o estoque.\nRequisitos funcionais relacionados: 2E, 2E.a.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Registrar a compra de um produto",
+                "parameters": [
+                    {
+                        "description": "Informações da compra para registro",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.PurchaseProductRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Compra registrada com sucesso",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do sistema",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -852,6 +898,23 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "requests.PurchaseProductRequest": {
+            "type": "object",
+            "properties": {
+                "created_by": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "integer"
+                },
+                "purchase_price": {
+                    "type": "number"
+                },
+                "quantity": {
                     "type": "integer"
                 }
             }

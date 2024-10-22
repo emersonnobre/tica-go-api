@@ -27,3 +27,11 @@ func NewEmptyProduct() *Product {
 	product.UpdatedBy = &Employee{}
 	return &product
 }
+
+func (p *Product) Update(stock int, purchasePrice float32, updatedBy *Employee) {
+	p.PurchasePrice = purchasePrice
+	p.Stock = stock
+	now := time.Now()
+	p.UpdatedAt = &now
+	p.UpdatedBy = updatedBy
+}

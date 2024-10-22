@@ -100,6 +100,17 @@ definitions:
       stock:
         type: integer
     type: object
+  requests.PurchaseProductRequest:
+    properties:
+      created_by:
+        type: integer
+      product_id:
+        type: integer
+      purchase_price:
+        type: number
+      quantity:
+        type: integer
+    type: object
   requests.UpdateProductRequest:
     properties:
       category_id:
@@ -510,7 +521,7 @@ paths:
       parameters:
       - description: Produto a ser criado
         in: body
-        name: employee
+        name: product
         required: true
         schema:
           $ref: '#/definitions/requests.CreateProductRequest'
@@ -627,6 +638,38 @@ paths:
           schema:
             type: string
       summary: Atualizar produto
+      tags:
+      - products
+  /products/{id}/purchase:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Registra a compra de um produto e atualiza o estoque.
+        Requisitos funcionais relacionados: 2E, 2E.a.
+      parameters:
+      - description: Informações da compra para registro
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/requests.PurchaseProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Compra registrada com sucesso
+          schema:
+            type: string
+        "400":
+          description: Erro de validação
+          schema:
+            type: string
+        "500":
+          description: Erro interno do sistema
+          schema:
+            type: string
+      summary: Registrar a compra de um produto
       tags:
       - products
 schemes:
