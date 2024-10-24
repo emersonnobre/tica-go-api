@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/emersonnobre/tica-api-go/src/internal/database"
 	"github.com/golang-migrate/migrate/v4"
@@ -13,10 +14,13 @@ import (
 )
 
 func main() {
-	var env, action string
+	var env, action, forceVersion string
 	if len(os.Args) > 1 {
 		env = os.Args[1]
 		action = os.Args[2]
+		if len(os.Args) >= 4 {
+			forceVersion = os.Args[3]
+		}
 	}
 
 	if env == "development" {
@@ -47,6 +51,10 @@ func main() {
 	}
 
 	if action == "up" {
+		if forceVersion != "" {
+			version, _ := strconv.Atoi(forceVersion)
+			m.Force(version)
+		}
 		err := m.Up()
 		if err != nil {
 			if err != migrate.ErrNoChange {

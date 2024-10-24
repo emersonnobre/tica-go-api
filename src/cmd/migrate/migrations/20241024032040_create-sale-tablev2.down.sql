@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS sale_item;
+DROP TABLE IF EXISTS sale;
+DROP TABLE IF EXISTS type_of_payment;
+

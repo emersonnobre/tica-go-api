@@ -73,4 +73,10 @@ func setupDependencies(app *fiber.App, connection *sql.DB) {
 		registerProductOutflowUseCase,
 	)
 	productHandler.RegisterRoutes(app)
+
+	// sale dependencies
+	saleRepository := mysql_repository.NewMySQLSaleRepository(connection)
+	createSaleUseCase := usecases.NewCreateSaleUseCase(saleRepository, employeeRepository, customerRepository, productRepository)
+	saleHandler := handlers.NewSaleHandler(createSaleUseCase)
+	saleHandler.RegisterRoutes(app)
 }

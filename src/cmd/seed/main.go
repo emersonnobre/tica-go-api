@@ -21,6 +21,7 @@ func main() {
 	seedProducts(db)
 	seedCustomers(db)
 	seedAddresses(db)
+	seedTypesOfPayment(db)
 }
 
 func seedCategories(db *sql.DB) {
@@ -141,6 +142,31 @@ func seedAddresses(db *sql.DB) {
 		INSERT INTO addresses (street, neighborhood, cep, customer_id)
 		VALUES ('Rua santo angelo, 22', 'Vila Macoré', '9999999', 1),
 		 	   ('Rua santo miguelito, 672', 'Vila Amonbarto', '8888888', 2);
+				
+	`)
+
+	if err != nil {
+		log.Fatal("Error seeding addresses table", err)
+	}
+}
+
+func seedTypesOfPayment(db *sql.DB) {
+	row := db.QueryRow("SELECT COUNT(*) FROM type_of_payment")
+	count := 0
+
+	if err := row.Scan(&count); err != nil {
+		log.Fatal("Error seeding type_of_payment table", err)
+	}
+
+	if count > 0 {
+		return
+	}
+
+	_, err := db.Exec(`
+		INSERT INTO type_of_payment (description)
+		VALUES ('Dinheiro/PIX/Cartão de débito'),
+		 	   ('Cartão de crédito'),
+			   ('Clube');
 				
 	`)
 

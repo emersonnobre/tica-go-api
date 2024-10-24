@@ -17,7 +17,7 @@ run-container:
 migration:
 	migrate create -ext sql -dir src/cmd/migrate/migrations $(filter-out $@,$(MAKECMDGOALS))
 migrate-dev-up:
-	go run src/cmd/migrate/main.go development up
+	go run src/cmd/migrate/main.go development up $(filter-out $@,$(MAKECMDGOALS))
 migrate-dev-down:
 	go run src/cmd/migrate/main.go development down
 migrate-prod-up:

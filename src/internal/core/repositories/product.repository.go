@@ -9,4 +9,5 @@ type ProductRepository interface {
 	Update(*domain.Product) error
 	Delete(id int) error
 	Get(limit int, offset int, orderBy string, order string, filters []Filter) ([]domain.Product, error)
+	UpdateStock(id, stock, employee_id int) error
 }

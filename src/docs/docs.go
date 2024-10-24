@@ -798,6 +798,52 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/sales": {
+            "post": {
+                "description": "Registra uma nova venda.\nRequisitos funcionais relacionados: 3A, 3A.1.\nDesconto (discount): Desconto total em cima da venda. É opcional.\nObservações (comments): É opcional.\nTipo do pagamento (type_of_payment_id): Tipo do pagamento, 1, 2 ou 3. É obrigatório.\nFuncionário da venda (employee_id): É obrigatório.\nCliente da venda (customer_id): É obrigatório.\nItens da venda (items): Os produtos da venda e a quantidade de cada um.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sales"
+                ],
+                "summary": "Registrar uma nova venda",
+                "parameters": [
+                    {
+                        "description": "Venda a ser registrada",
+                        "name": "sale",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.CreateSaleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Venda registrada com sucesso",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do sistema",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -950,6 +996,43 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "requests.CreateSaleItemRequest": {
+            "type": "object",
+            "properties": {
+                "product_id": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "requests.CreateSaleRequest": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "string"
+                },
+                "customer_id": {
+                    "type": "integer"
+                },
+                "discount": {
+                    "type": "number"
+                },
+                "employee_id": {
+                    "type": "integer"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/requests.CreateSaleItemRequest"
+                    }
+                },
+                "type_of_payment": {
                     "type": "integer"
                 }
             }

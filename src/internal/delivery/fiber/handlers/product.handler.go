@@ -100,7 +100,7 @@ func (h *ProductHandler) Update(ctx *fiber.Ctx) error {
 
 	var product requests.UpdateProductRequest
 	if err := ctx.BodyParser(&product); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar requisição!")
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar a requisição!")
 	}
 
 	product.Id = id
@@ -245,7 +245,7 @@ func (h *ProductHandler) Get(ctx *fiber.Ctx) error {
 func (h *ProductHandler) Purchase(ctx *fiber.Ctx) error {
 	var purchase requests.PurchaseProductRequest
 	if err := ctx.BodyParser(&purchase); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar requisição!")
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar a requisição!")
 	}
 	response := h.purchaseProductUseCase.Execute(&purchase)
 	if response.ErrorName != nil {
@@ -271,7 +271,7 @@ func (h *ProductHandler) Purchase(ctx *fiber.Ctx) error {
 func (h *ProductHandler) RegisterOutflow(ctx *fiber.Ctx) error {
 	var outflow requests.ProductOutflow
 	if err := ctx.BodyParser(&outflow); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar requisição!")
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar a requisição!")
 	}
 	response := h.registerProductOutflowUseCase.Execute(&outflow)
 	if response.ErrorName != nil {

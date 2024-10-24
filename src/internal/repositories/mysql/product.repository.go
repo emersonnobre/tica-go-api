@@ -180,3 +180,13 @@ func (r *MySQLProductRepository) Get(limit int, offset int, orderBy string, orde
 
 	return products, nil
 }
+
+func (r *MySQLProductRepository) UpdateStock(id, stock, employee_id int) error {
+	stmt := fmt.Sprintf(`UPDATE products SET stock = %d, updated_by = %d, updated_at = NOW() WHERE id = %d`, stock, employee_id, id)
+	_, err := r.db.Exec(stmt)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
