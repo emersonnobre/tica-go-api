@@ -9,6 +9,8 @@ run-dev:
 	go run src/cmd/seed/main.go
 	go run src/main.go development
 run-prod:
+	cd src
+	swag init --dir src --output src/docs
 	go run src/main.go production
 
 run-container:
