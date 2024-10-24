@@ -1,1 +1,1 @@
-INSERT INTO type_of_payment (description) values ('Dinheiro/PIX/Cartão de débito'), ('Cartão de crédito'), ('Clube');
+select * from products;
