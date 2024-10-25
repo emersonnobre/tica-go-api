@@ -42,13 +42,15 @@ func setupDependencies(app *fiber.App, connection *sql.DB) {
 	employeeHandler.RegisterRoutes(app)
 
 	// customer dependencies
+	saleRepository := mysql_repository.NewMySQLSaleRepository(connection)
 	customerRepository := mysql_repository.NewMySQLCustomerRepository(connection)
 	createCustomerUseCase := usecases.NewCreateCustomerUseCase(customerRepository, createAddressUseCase)
 	getCustomerUseCase := usecases.NewGetCustomerUseCase(customerRepository)
 	getCustomersUseCase := usecases.NewGetCustomersUseCase(customerRepository)
 	updateCustomerUseCase := usecases.NewUpdateCustomerUseCase(customerRepository, createAddressUseCase, removeAddressUseCase)
 	removeCustomerUseCase := usecases.NewRemoveCustomerUseCase(customerRepository)
-	customerHandler := handlers.NewCustomerHandler(createCustomerUseCase, getCustomerUseCase, updateCustomerUseCase, removeCustomerUseCase, getCustomersUseCase)
+	getCustomerSalesUseCase := usecases.NewGetCustomerSalesUseCase(saleRepository)
+	customerHandler := handlers.NewCustomerHandler(createCustomerUseCase, getCustomerUseCase, updateCustomerUseCase, removeCustomerUseCase, getCustomersUseCase, getCustomerSalesUseCase)
 	customerHandler.RegisterRoutes(app)
 
 	// transaction dependencies
@@ -75,7 +77,6 @@ func setupDependencies(app *fiber.App, connection *sql.DB) {
 	productHandler.RegisterRoutes(app)
 
 	// sale dependencies
-	saleRepository := mysql_repository.NewMySQLSaleRepository(connection)
 	createSaleUseCase := usecases.NewCreateSaleUseCase(saleRepository, employeeRepository, customerRepository, productRepository)
 	getSalesUseCase := usecases.NewGetSalesUseCase(saleRepository)
 	saleHandler := handlers.NewSaleHandler(createSaleUseCase, getSalesUseCase)

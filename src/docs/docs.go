@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/categories": {
             "get": {
-                "description": "Obtém todas as categorias sem filtro ou ordenação.",
+                "description": "Requisitos funcionais relacionados: 7B.",
                 "produces": [
                     "application/json"
                 ],
@@ -44,7 +44,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Cria uma nova categoria de produtos.",
+                "description": "Requisitos funcionais relacionados: 7A.",
                 "consumes": [
                     "application/json"
                 ],
@@ -90,7 +90,7 @@ const docTemplate = `{
         },
         "/customers": {
             "get": {
-                "description": "Obtém uma lista de clientes paginada.\nFiltros disponíveis: name (nome) e cpf.\nCampos disponíveis para ordenação (em inglês): name, created_at e updated_at (orderBy)\nPara ordenação, pode ser utilizado o mecanismo ascendente e descendente (ASC e DESC) (order)\noffset: utilizado para paginação, define a quantidade de itens a serem \"pulados\".\nlimit: utilizado para paginação, define a quantidade máxima de itens a serem obtidos.",
+                "description": "Requisitos funcionais relacionados: 1D.\nFiltros disponíveis: name (nome) e cpf.\nCampos disponíveis para ordenação (em inglês): name, created_at e updated_at (orderBy)\nPara ordenação, pode ser utilizado o mecanismo ascendente e descendente (ASC e DESC) (order)\noffset: utilizado para paginação, define a quantidade de itens a serem \"pulados\".\nlimit: utilizado para paginação, define a quantidade máxima de itens a serem obtidos.",
                 "consumes": [
                     "application/json"
                 ],
@@ -158,7 +158,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Atualiza um cliente.\nCampos obrigatórios: nome.\nCampos opcionais: CPF, telefone, e-mail, instagram e data de nascimento.\nOs endereços também podem ser atualizados. Para criar um endereço, envie um objeto com id vazio. Para deletar um endereço existente, não o envie na lista.\nCampos obrigatórios: Rua e bairro.\nCampos opcionais: CEP.",
+                "description": "Requisitos funcionais relacionados: 1B.\nCampos obrigatórios: nome.\nCampos opcionais: CPF, telefone, e-mail, instagram e data de nascimento.\nOs endereços também podem ser atualizados. Para criar um endereço, envie um objeto com id vazio. Para deletar um endereço existente, não o envie na lista.\nCampos obrigatórios: Rua e bairro.\nCampos opcionais: CEP.",
                 "consumes": [
                     "application/json"
                 ],
@@ -212,7 +212,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Cria um novo cliente.\nCampos obrigatórios: nome.\nCampos opcionais: CPF, telefone, e-mail, instagram e data de nascimento.\nUma lista de endereços também pode ser cadastrada para o cliente.\nCampos obrigatórios: Rua e bairro.\nCampos opcionais: CEP.",
+                "description": "Requisitos funcionais relacionados: 1A.\nCampos obrigatórios: nome.\nCampos opcionais: CPF, telefone, e-mail, instagram e data de nascimento.\nUma lista de endereços também pode ser cadastrada para o cliente.\nCampos obrigatórios: Rua e bairro.\nCampos opcionais: CEP.",
                 "consumes": [
                     "application/json"
                 ],
@@ -258,7 +258,7 @@ const docTemplate = `{
         },
         "/customers/{id}": {
             "get": {
-                "description": "Obtém um cliente por id.",
+                "description": "Requisitos funcionais relacionados: 1F.",
                 "produces": [
                     "application/json"
                 ],
@@ -303,7 +303,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Deleta um cliente por id.",
+                "description": "Requisitos funcionais relacionados: 1C.",
                 "produces": [
                     "application/json"
                 ],
@@ -345,9 +345,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/customers/{id}/sales": {
+            "get": {
+                "description": "Requisitos funcionais relacionados: 1E.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "Obter as vendas vinculadas a um cliente",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id do cliente",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "As vendas vinculadas ao cliente",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.SaleResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Cliente não encontrado",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do sistema",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/employees": {
             "post": {
-                "description": "Cria um novo funcionário.\nCampos obrigatórios: nome e CPF.",
+                "description": "Requisitos funcionais relacionados: 6A.\nCampos obrigatórios: nome e CPF.",
                 "consumes": [
                     "application/json"
                 ],
@@ -393,7 +443,7 @@ const docTemplate = `{
         },
         "/employees/{id}": {
             "get": {
-                "description": "Obtém um funcionário por id.",
+                "description": "Requisitos funcionais relacionados: 6B.",
                 "produces": [
                     "application/json"
                 ],
@@ -440,7 +490,7 @@ const docTemplate = `{
         },
         "/products": {
             "get": {
-                "description": "Obtém uma lista de produtos paginada.\nRequisitos funcionais relacionados: 2B.\nFiltros disponíveis: name (nome), is_feedstock (se é matéria prima), category_id (id da categoria).\nCampos disponíveis para ordenação (em inglês): name e created_at (orderBy)\nPara ordenação, pode ser utilizado o mecanismo ascendente e descendente (ASC e DESC) (order)\noffset: utilizado para paginação, define a quantidade de itens a serem \"pulados\".\nlimit: utilizado para paginação, define a quantidade máxima de itens a serem obtidos.",
+                "description": "Requisitos funcionais relacionados: 2B.\nFiltros disponíveis: name (nome), is_feedstock (se é matéria prima), category_id (id da categoria).\nCampos disponíveis para ordenação (em inglês): name e created_at (orderBy)\nPara ordenação, pode ser utilizado o mecanismo ascendente e descendente (ASC e DESC) (order)\noffset: utilizado para paginação, define a quantidade de itens a serem \"pulados\".\nlimit: utilizado para paginação, define a quantidade máxima de itens a serem obtidos.",
                 "consumes": [
                     "application/json"
                 ],
@@ -520,7 +570,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Cria um novo produto.\nRequisitos funcionais relacionados: 2A.",
+                "description": "Requisitos funcionais relacionados: 2A.",
                 "consumes": [
                     "application/json"
                 ],
@@ -656,7 +706,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Deleta um produto pelo id.\nRequisitos funcionais relacionados: 2D.",
+                "description": "Requisitos funcionais relacionados: 2D.",
                 "consumes": [
                     "application/json"
                 ],
@@ -863,7 +913,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Registra uma nova venda.\nRequisitos funcionais relacionados: 3A, 3A.1.\nDesconto (discount): Desconto total em cima da venda. É opcional.\nObservações (comments): É opcional.\nTipo do pagamento (type_of_payment_id): Tipo do pagamento, 1, 2 ou 3. É obrigatório.\nFuncionário da venda (employee_id): É obrigatório.\nCliente da venda (customer_id): É obrigatório.\nItens da venda (items): Os produtos da venda e a quantidade de cada um.",
+                "description": "Requisitos funcionais relacionados: 3A, 3A.1.\nDesconto (discount): Desconto total em cima da venda. É opcional.\nObservações (comments): É opcional.\nTipo do pagamento (type_of_payment_id): Tipo do pagamento, 1, 2 ou 3. É obrigatório.\nFuncionário da venda (employee_id): É obrigatório.\nCliente da venda (customer_id): É obrigatório.\nItens da venda (items): Os produtos da venda e a quantidade de cada um.",
                 "consumes": [
                     "application/json"
                 ],

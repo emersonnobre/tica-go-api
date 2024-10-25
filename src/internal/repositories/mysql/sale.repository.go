@@ -114,3 +114,52 @@ func (r *MySQLSaleRepository) GetCount() (*int, error) {
 	}
 	return &count, nil
 }
+
+func (r *MySQLSaleRepository) GetByCustomer(id int) ([]domain.Sale, error) {
+	query := fmt.Sprintf(`
+		SELECT s.id, s.total_price, s.discount, s.comments, s.type_of_payment_id, s.created_at, e.id, e.name, e.cpf, c.id, c.name, c.cpf
+		FROM sale s
+		INNER JOIN employees e on s.employee_id = e.id
+		INNER JOIN customers c on s.customer_id = c.id
+		where customer_id = %d
+	`, id)
+	rows, err := r.db.Query(query)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	sales := []domain.Sale{}
+	for rows.Next() {
+		sale := domain.Sale{}
+		sale.Customer = &domain.Customer{}
+		sale.Employee = &domain.Employee{}
+		err := rows.Scan(
+			&sale.Id,
+			&sale.TotalPrice,
+			&sale.Discount,
+			&sale.Comments,
+			&sale.TypeOfPayment,
+			&sale.CreatedAt,
+			&sale.Employee.Id,
+			&sale.Employee.Name,
+			&sale.Employee.Cpf,
+			&sale.Customer.Id,
+			&sale.Customer.Name,
+			&sale.Customer.Cpf,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		sales = append(sales, sale)
+	}
+
+	if rows.Err() != nil && rows.Err() != sql.ErrNoRows {
+		return nil, err
+	}
+
+	return sales, nil
+}

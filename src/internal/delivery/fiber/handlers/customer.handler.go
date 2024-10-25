@@ -12,11 +12,12 @@ import (
 )
 
 type CustomerHandler struct {
-	createCustomerUseCase *usecases.CreateCustomerUseCase
-	getCustomerUseCase    *usecases.GetCustomerUseCase
-	updateCustomerUseCase *usecases.UpdateCustomerUseCase
-	removeCustomerUseCase *usecases.RemoveCustomerUseCase
-	getCustomersUseCase   *usecases.GetCustomersUseCase
+	createCustomerUseCase   *usecases.CreateCustomerUseCase
+	getCustomerUseCase      *usecases.GetCustomerUseCase
+	updateCustomerUseCase   *usecases.UpdateCustomerUseCase
+	removeCustomerUseCase   *usecases.RemoveCustomerUseCase
+	getCustomersUseCase     *usecases.GetCustomersUseCase
+	getCustomerSalesUseCase *usecases.GetCustomerSalesUseCase
 }
 
 func NewCustomerHandler(
@@ -25,13 +26,15 @@ func NewCustomerHandler(
 	updateCustomerUseCase *usecases.UpdateCustomerUseCase,
 	removeCustomerUseCase *usecases.RemoveCustomerUseCase,
 	getCustomersUseCase *usecases.GetCustomersUseCase,
+	getCustomerSalesUseCase *usecases.GetCustomerSalesUseCase,
 ) *CustomerHandler {
 	return &CustomerHandler{
-		createCustomerUseCase: createCustomerUseCase,
-		getCustomerUseCase:    getCustomerUseCase,
-		updateCustomerUseCase: updateCustomerUseCase,
-		removeCustomerUseCase: removeCustomerUseCase,
-		getCustomersUseCase:   getCustomersUseCase,
+		createCustomerUseCase:   createCustomerUseCase,
+		getCustomerUseCase:      getCustomerUseCase,
+		updateCustomerUseCase:   updateCustomerUseCase,
+		removeCustomerUseCase:   removeCustomerUseCase,
+		getCustomersUseCase:     getCustomersUseCase,
+		getCustomerSalesUseCase: getCustomerSalesUseCase,
 	}
 }
 
@@ -43,6 +46,7 @@ func (h *CustomerHandler) RegisterRoutes(app *fiber.App) {
 	group.Get("/:id", h.GetById)
 	group.Put("/:id", h.Update)
 	group.Delete("/:id", h.Delete)
+	group.Get("/:id/sales", h.GetCustomerSales)
 }
 
 //	    CreateCustomer godoc
@@ -187,6 +191,32 @@ func (h *CustomerHandler) Get(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(response.Data)
 }
 
+//	 	GetCustomerSales godoc
+//
+//		@Summary        Obter as vendas vinculadas a um cliente
+//		@Description    Requisitos funcionais relacionados: 1E.
+//		@Tags           customers
+//		@Produce        json
+//		@Param          id  		path      	integer true  "Id do cliente"
+//		@Success        200 		{array}   responses.SaleResponse	"As vendas vinculadas ao cliente"
+//		@Failure        400 		{string}   string	 		"Erro de validação"
+//		@Failure        404 		{string}   string	 		"Cliente não encontrado"
+//		@Failure        500 		{string}   string	 		"Erro interno do sistema"
+//		@Router         /customers/{id}/sales [get]
+func (h *CustomerHandler) GetById(ctx *fiber.Ctx) error {
+	id, err := strconv.Atoi(ctx.Params("id"))
+
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
+	}
+
+	response := h.getCustomerUseCase.Execute(id)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.Status(fiber.StatusOK).JSON(response.Data)
+}
+
 //	 	GetCustomerById godoc
 //
 //		@Summary        Obter um cliente
@@ -199,14 +229,14 @@ func (h *CustomerHandler) Get(ctx *fiber.Ctx) error {
 //		@Failure        404 		{string}   string	 		"Cliente não encontrado"
 //		@Failure        500 		{string}   string	 		"Erro interno do sistema"
 //		@Router         /customers/{id} [get]
-func (h *CustomerHandler) GetById(ctx *fiber.Ctx) error {
+func (h *CustomerHandler) GetCustomerSales(ctx *fiber.Ctx) error {
 	id, err := strconv.Atoi(ctx.Params("id"))
 
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
 	}
 
-	response := h.getCustomerUseCase.Execute(id)
+	response := h.getCustomerSalesUseCase.Execute(id)
 	if response.ErrorName != nil {
 		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
 	}
