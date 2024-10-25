@@ -32,7 +32,7 @@ func (h *CategoryHandler) RegisterRoutes(app *fiber.App) {
 // CreateCategory godoc
 //
 //	@Summary        Criar uma categoria
-//	@Description    Cria uma nova categoria de produtos.
+//	@Description    Requisitos funcionais relacionados: 7A.
 //	@Tags           categories
 //	@Accept         json
 //	@Produce        json
@@ -52,13 +52,14 @@ func (h *CategoryHandler) Create(ctx *fiber.Ctx) error {
 		ctx.SendString(*response.ErrorMessage)
 		return ctx.SendStatus(util.CoreErrorToHttpError(*response.ErrorName))
 	}
+	//	@Failure        500 	{string}	string	 	"Erro interno do sistem
 	return ctx.SendStatus(http.StatusCreated)
 }
 
 // GetAllCategories godoc
 //
 //		@Summary        Obter todas as categorias
-//		@Description    Obtém todas as categorias sem filtro ou ordenação.
+//		@Description    Requisitos funcionais relacionados: 7B.
 //		@Tags           categories
 //		@Produce        json
 //		@Success        200 	{array}		domain.Category 	"Uma lista de categorias"

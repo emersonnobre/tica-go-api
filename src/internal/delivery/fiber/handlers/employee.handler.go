@@ -34,7 +34,7 @@ func (h *EmployeeHandler) RegisterRoutes(app *fiber.App) {
 //	    CreateEmployee godoc
 //
 //		@Summary        Criar um novo funcionário
-//		@Description    Cria um novo funcionário.
+//		@Description    Requisitos funcionais relacionados: 6A.
 //		@Description    Campos obrigatórios: nome e CPF.
 //		@Tags           employees
 //		@Accept         json
@@ -59,7 +59,7 @@ func (h *EmployeeHandler) Create(ctx *fiber.Ctx) error {
 //	    GetEmployeeById godoc
 //
 //		@Summary        Obter um funcionário
-//		@Description    Obtém um funcionário por id.
+//		@Description    Requisitos funcionais relacionados: 6B.
 //		@Tags           employees
 //		@Produce        json
 //		@Param          id  		path       integer true "Id do funcionário a ser obtido"

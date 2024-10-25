@@ -55,7 +55,6 @@ func (h *ProductHandler) RegisterRoutes(app *fiber.App) {
 //	    CreateProduct godoc
 //
 //		@Summary        Criar um novo produto
-//		@Description    Cria um novo produto.
 //		@Description    Requisitos funcionais relacionados: 2A.
 //		@Tags           products
 //		@Accept         json
@@ -77,99 +76,9 @@ func (h *ProductHandler) Create(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(fiber.StatusCreated)
 }
 
-//	    UpdateProduct godoc
-//
-//		@Summary        Atualizar produto
-//		@Description    Atualiza um produto pelo id.
-//		@Description    Requisitos funcionais relacionados: 2C.
-//		@Tags           products
-//		@Accept         json
-//		@Produce        json
-//		@Param          id  		path       integer true "Id do produto a ser atualizado"
-//		@Param          product  body      requests.UpdateProductRequest  true    "Informações para atualizar"
-//		@Success        204 	"Produto atualizado com sucesso"
-//		@Failure        400 	{string}	string	 	"Erro de validação"
-//		@Failure        500 	{string}	string	 	"Erro interno do sistema"
-//		@Router         /products/{id} [put]
-func (h *ProductHandler) Update(ctx *fiber.Ctx) error {
-	id, err := strconv.Atoi(ctx.Params("id"))
-
-	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
-	}
-
-	var product requests.UpdateProductRequest
-	if err := ctx.BodyParser(&product); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar a requisição!")
-	}
-
-	product.Id = id
-	response := h.updateProductUseCase.Execute(product)
-	if response.ErrorName != nil {
-		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
-	}
-	return ctx.SendStatus(fiber.StatusNoContent)
-}
-
-//	    GetProduct godoc
-//
-//		@Summary        Obter um produto
-//		@Description    Obtém um produto pelo id.
-//		@Description    Requisitos funcionais relacionados: 2G.
-//		@Tags           products
-//		@Accept         json
-//		@Produce        json
-//		@Param          id  		path       integer true "Id do produto a ser obtido"
-//		@Success        200		{object}	domain.Product  			"Produto encontrado"
-//		@Failure        404 	{string}	string	 					"Produto não encontrado"
-//		@Failure        500 	{string}	string	 					"Erro interno do sistema"
-//		@Router         /products/{id} [get]
-func (h *ProductHandler) GetById(ctx *fiber.Ctx) error {
-	id, err := strconv.Atoi(ctx.Params("id"))
-
-	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
-	}
-
-	response := h.getProductUseCase.Execute(id)
-	if response.ErrorName != nil {
-		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
-	}
-	return ctx.Status(fiber.StatusOK).JSON(response.Data)
-}
-
-//	    DeleteProduct godoc
-//
-//		@Summary        Deleta um produto
-//		@Description    Deleta um produto pelo id.
-//		@Description    Requisitos funcionais relacionados: 2D.
-//		@Tags           products
-//		@Accept         json
-//		@Produce        json
-//		@Param          id  		path       integer true "Id do produto a ser deletado"
-//		@Success        204	  	"Produto deletado com sucesso"
-//		@Failure        404 	{string}	string	 					"Produto não encontrado"
-//		@Failure        400 	{string}	string	 					"Erro de validação"
-//		@Failure        500 	{string}	string	 					"Erro interno do sistema"
-//		@Router         /products/{id} [delete]
-func (h *ProductHandler) Delete(ctx *fiber.Ctx) error {
-	id, err := strconv.Atoi(ctx.Params("id"))
-
-	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
-	}
-
-	response := h.removeProductUseCase.Execute(id)
-	if response.ErrorName != nil {
-		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
-	}
-	return ctx.SendStatus(fiber.StatusNoContent)
-}
-
 //	    GetProducts godoc
 //
 //		@Summary        Obter uma lista de produtos paginada, ordenada e filtrada
-//		@Description    Obtém uma lista de produtos paginada.
 //		@Description    Requisitos funcionais relacionados: 2B.
 //		@Description    Filtros disponíveis: name (nome), is_feedstock (se é matéria prima), category_id (id da categoria).
 //		@Description    Campos disponíveis para ordenação (em inglês): name e created_at (orderBy)
@@ -229,6 +138,67 @@ func (h *ProductHandler) Get(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(response.Data)
 }
 
+//	    UpdateProduct godoc
+//
+//		@Summary        Atualizar produto
+//		@Description    Atualiza um produto pelo id.
+//		@Description    Requisitos funcionais relacionados: 2C.
+//		@Tags           products
+//		@Accept         json
+//		@Produce        json
+//		@Param          id  		path       integer true "Id do produto a ser atualizado"
+//		@Param          product  body      requests.UpdateProductRequest  true    "Informações para atualizar"
+//		@Success        204 	"Produto atualizado com sucesso"
+//		@Failure        400 	{string}	string	 	"Erro de validação"
+//		@Failure        500 	{string}	string	 	"Erro interno do sistema"
+//		@Router         /products/{id} [put]
+func (h *ProductHandler) Update(ctx *fiber.Ctx) error {
+	id, err := strconv.Atoi(ctx.Params("id"))
+
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
+	}
+
+	var product requests.UpdateProductRequest
+	if err := ctx.BodyParser(&product); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar a requisição!")
+	}
+
+	product.Id = id
+	response := h.updateProductUseCase.Execute(product)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.SendStatus(fiber.StatusNoContent)
+}
+
+//	    DeleteProduct godoc
+//
+//		@Summary        Deleta um produto
+//		@Description    Requisitos funcionais relacionados: 2D.
+//		@Tags           products
+//		@Accept         json
+//		@Produce        json
+//		@Param          id  		path       integer true "Id do produto a ser deletado"
+//		@Success        204	  	"Produto deletado com sucesso"
+//		@Failure        404 	{string}	string	 					"Produto não encontrado"
+//		@Failure        400 	{string}	string	 					"Erro de validação"
+//		@Failure        500 	{string}	string	 					"Erro interno do sistema"
+//		@Router         /products/{id} [delete]
+func (h *ProductHandler) Delete(ctx *fiber.Ctx) error {
+	id, err := strconv.Atoi(ctx.Params("id"))
+
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
+	}
+
+	response := h.removeProductUseCase.Execute(id)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.SendStatus(fiber.StatusNoContent)
+}
+
 //	    PurchaseProduct godoc
 //
 //		@Summary        Registrar a compra de um produto
@@ -278,4 +248,31 @@ func (h *ProductHandler) RegisterOutflow(ctx *fiber.Ctx) error {
 		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
 	}
 	return ctx.SendStatus(fiber.StatusCreated)
+}
+
+//	    GetProduct godoc
+//
+//		@Summary        Obter um produto
+//		@Description    Obtém um produto pelo id.
+//		@Description    Requisitos funcionais relacionados: 2G.
+//		@Tags           products
+//		@Accept         json
+//		@Produce        json
+//		@Param          id  		path       integer true "Id do produto a ser obtido"
+//		@Success        200		{object}	domain.Product  			"Produto encontrado"
+//		@Failure        404 	{string}	string	 					"Produto não encontrado"
+//		@Failure        500 	{string}	string	 					"Erro interno do sistema"
+//		@Router         /products/{id} [get]
+func (h *ProductHandler) GetById(ctx *fiber.Ctx) error {
+	id, err := strconv.Atoi(ctx.Params("id"))
+
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
+	}
+
+	response := h.getProductUseCase.Execute(id)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.Status(fiber.StatusOK).JSON(response.Data)
 }

@@ -32,7 +32,6 @@ func (h *SaleHandler) RegisterRoutes(app *fiber.App) {
 //	    CreateSale godoc
 //
 //		@Summary        Registrar uma nova venda
-//		@Description    Registra uma nova venda.
 //		@Description    Requisitos funcionais relacionados: 3A, 3A.1.
 //		@Description    Desconto (discount): Desconto total em cima da venda. É opcional.
 //		@Description    Observações (comments): É opcional.

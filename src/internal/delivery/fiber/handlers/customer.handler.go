@@ -48,7 +48,7 @@ func (h *CustomerHandler) RegisterRoutes(app *fiber.App) {
 //	    CreateCustomer godoc
 //
 //		@Summary        Criar um novo cliente
-//		@Description    Cria um novo cliente.
+//		@Description    Requisitos funcionais relacionados: 1A.
 //		@Description    Campos obrigatórios: nome.
 //		@Description    Campos opcionais: CPF, telefone, e-mail, instagram e data de nascimento.
 //		@Description    Uma lista de endereços também pode ser cadastrada para o cliente.
@@ -74,10 +74,75 @@ func (h *CustomerHandler) Create(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(http.StatusCreated)
 }
 
+//	    UpdateCustomer godoc
+//
+//		@Summary        Atualizar cliente
+//		@Description    Requisitos funcionais relacionados: 1B.
+//		@Description    Campos obrigatórios: nome.
+//		@Description    Campos opcionais: CPF, telefone, e-mail, instagram e data de nascimento.
+//		@Description    Os endereços também podem ser atualizados. Para criar um endereço, envie um objeto com id vazio. Para deletar um endereço existente, não o envie na lista.
+//		@Description    Campos obrigatórios: Rua e bairro.
+//		@Description    Campos opcionais: CEP.
+//		@Tags           customers
+//		@Accept         json
+//		@Produce        json
+//		@Param          id        path   	integer  		 true    "Id do cliente a ser atualizado"
+//		@Param          customer  body      domain.Customer  true    "Cliente a ser atualizado"
+//		@Success        204 	 	"Cliente atualizado com sucesso"
+//		@Failure        400 	{string}	string	 	"Erro de validação"
+//		@Failure        404 	{string}    string	 	"Cliente não encontrado"
+//		@Failure        500 	{string}	string	 	"Erro interno do sistema"
+//		@Router         /customers [put]
+func (h *CustomerHandler) Update(ctx *fiber.Ctx) error {
+	id, err := strconv.Atoi(ctx.Params("id"))
+
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
+	}
+
+	var customer domain.Customer
+	if err := ctx.BodyParser(&customer); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar a requisição!")
+	}
+
+	customer.Id = id
+	response := h.updateCustomerUseCase.Execute(customer)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.SendStatus(fiber.StatusNoContent)
+}
+
+//	 	DeleteCustomer godoc
+//
+//		@Summary        Deleta um cliente
+//		@Description    Requisitos funcionais relacionados: 1C.
+//		@Tags           customers
+//		@Produce        json
+//		@Param          id  		path      	integer true  "Id do cliente"
+//		@Success        204
+//		@Failure        400 		{string}   string	 		"Erro de validação"
+//		@Failure        404 		{string}   string	 		"Cliente não encontrado"
+//		@Failure        500 		{string}   string	 		"Erro interno do sistema"
+//		@Router         /customers/{id} [delete]
+func (h *CustomerHandler) Delete(ctx *fiber.Ctx) error {
+	id, err := strconv.Atoi(ctx.Params("id"))
+
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
+	}
+
+	response := h.removeCustomerUseCase.Execute(id)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.SendStatus(fiber.StatusNoContent)
+}
+
 //	    GetCustomers godoc
 //
 //		@Summary        Obter uma lista de clientes paginada, ordenada e filtrada
-//		@Description    Obtém uma lista de clientes paginada.
+//		@Description    Requisitos funcionais relacionados: 1D.
 //		@Description    Filtros disponíveis: name (nome) e cpf.
 //		@Description    Campos disponíveis para ordenação (em inglês): name, created_at e updated_at (orderBy)
 //		@Description    Para ordenação, pode ser utilizado o mecanismo ascendente e descendente (ASC e DESC) (order)
@@ -125,7 +190,7 @@ func (h *CustomerHandler) Get(ctx *fiber.Ctx) error {
 //	 	GetCustomerById godoc
 //
 //		@Summary        Obter um cliente
-//		@Description    Obtém um cliente por id.
+//		@Description    Requisitos funcionais relacionados: 1F.
 //		@Tags           customers
 //		@Produce        json
 //		@Param          id  		path      	integer true  "Id do cliente"
@@ -146,69 +211,4 @@ func (h *CustomerHandler) GetById(ctx *fiber.Ctx) error {
 		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
 	}
 	return ctx.Status(fiber.StatusOK).JSON(response.Data)
-}
-
-//	    UpdateCustomer godoc
-//
-//		@Summary        Atualizar cliente
-//		@Description    Atualiza um cliente.
-//		@Description    Campos obrigatórios: nome.
-//		@Description    Campos opcionais: CPF, telefone, e-mail, instagram e data de nascimento.
-//		@Description    Os endereços também podem ser atualizados. Para criar um endereço, envie um objeto com id vazio. Para deletar um endereço existente, não o envie na lista.
-//		@Description    Campos obrigatórios: Rua e bairro.
-//		@Description    Campos opcionais: CEP.
-//		@Tags           customers
-//		@Accept         json
-//		@Produce        json
-//		@Param          id        path   	integer  		 true    "Id do cliente a ser atualizado"
-//		@Param          customer  body      domain.Customer  true    "Cliente a ser atualizado"
-//		@Success        204 	 	"Cliente atualizado com sucesso"
-//		@Failure        400 	{string}	string	 	"Erro de validação"
-//		@Failure        404 	{string}    string	 	"Cliente não encontrado"
-//		@Failure        500 	{string}	string	 	"Erro interno do sistema"
-//		@Router         /customers [put]
-func (h *CustomerHandler) Update(ctx *fiber.Ctx) error {
-	id, err := strconv.Atoi(ctx.Params("id"))
-
-	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
-	}
-
-	var customer domain.Customer
-	if err := ctx.BodyParser(&customer); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar a requisição!")
-	}
-
-	customer.Id = id
-	response := h.updateCustomerUseCase.Execute(customer)
-	if response.ErrorName != nil {
-		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
-	}
-	return ctx.SendStatus(fiber.StatusNoContent)
-}
-
-//	 	DeleteCustomer godoc
-//
-//		@Summary        Deleta um cliente
-//		@Description    Deleta um cliente por id.
-//		@Tags           customers
-//		@Produce        json
-//		@Param          id  		path      	integer true  "Id do cliente"
-//		@Success        204
-//		@Failure        400 		{string}   string	 		"Erro de validação"
-//		@Failure        404 		{string}   string	 		"Cliente não encontrado"
-//		@Failure        500 		{string}   string	 		"Erro interno do sistema"
-//		@Router         /customers/{id} [delete]
-func (h *CustomerHandler) Delete(ctx *fiber.Ctx) error {
-	id, err := strconv.Atoi(ctx.Params("id"))
-
-	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString("Erro ao interpretar o id!")
-	}
-
-	response := h.removeCustomerUseCase.Execute(id)
-	if response.ErrorName != nil {
-		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
-	}
-	return ctx.SendStatus(fiber.StatusNoContent)
 }
