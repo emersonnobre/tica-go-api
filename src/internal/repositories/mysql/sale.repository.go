@@ -2,6 +2,7 @@ package mysql_repository
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/emersonnobre/tica-api-go/src/internal/core/domain"
 )
@@ -56,4 +57,60 @@ func (r *MySQLSaleRepository) Create(sale *domain.Sale) error {
 	}
 
 	return nil
+}
+
+func (r *MySQLSaleRepository) Get(limit int, offset int, orderBy string, order string) ([]domain.Sale, error) {
+	query := fmt.Sprintf(`
+		SELECT s.id, s.total_price, s.discount, s.comments, s.type_of_payment_id, s.created_at, e.id, e.name, e.cpf, c.id, c.name, c.cpf
+		FROM sale s 
+		INNER JOIN employees e on s.employee_id = e.id
+		INNER JOIN customers c on s.customer_id = c.id
+		ORDER BY %s %s 
+		LIMIT %d OFFSET %d
+	`, orderBy, order, limit, offset)
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	sales := []domain.Sale{}
+	for rows.Next() {
+		sale := domain.Sale{}
+		sale.Employee = &domain.Employee{}
+		sale.Customer = &domain.Customer{}
+		err := rows.Scan(
+			&sale.Id,
+			&sale.TotalPrice,
+			&sale.Discount,
+			&sale.Comments,
+			&sale.TypeOfPayment,
+			&sale.CreatedAt,
+			&sale.Employee.Id,
+			&sale.Employee.Name,
+			&sale.Employee.Cpf,
+			&sale.Customer.Id,
+			&sale.Customer.Name,
+			&sale.Customer.Cpf)
+		if err != nil {
+			return nil, err
+		}
+		sales = append(sales, sale)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return sales, nil
+}
+
+func (r *MySQLSaleRepository) GetCount() (*int, error) {
+	count := 0
+	row := r.db.QueryRow("SELECT COUNT(id) FROM sale")
+	err := row.Scan(&count)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+	return &count, nil
 }

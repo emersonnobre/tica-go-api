@@ -180,6 +180,43 @@ definitions:
       stock:
         type: integer
     type: object
+  responses.SaleCustomerResponse:
+    properties:
+      cpf:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  responses.SaleEmployeeResponse:
+    properties:
+      cpf:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  responses.SaleResponse:
+    properties:
+      comments:
+        type: string
+      created_at:
+        type: string
+      customer:
+        $ref: '#/definitions/responses.SaleCustomerResponse'
+      discount:
+        type: number
+      employee:
+        $ref: '#/definitions/responses.SaleEmployeeResponse'
+      id:
+        type: integer
+      total_price:
+        type: number
+      type_of_payment:
+        type: integer
+    type: object
 host: localhost:3000
 info:
   contact: {}
@@ -744,6 +781,47 @@ paths:
       tags:
       - products
   /sales:
+    get:
+      consumes:
+      - application/json
+      description: 'Requisitos funcionais relacionados: 3D.'
+      parameters:
+      - description: Limite de itens a serem obtidos
+        in: query
+        name: limit
+        type: integer
+      - description: Quantidade de itens a serem pulados
+        in: query
+        name: offset
+        type: integer
+      - description: Nome do campo para ordenação (created_at, total_price)
+        in: query
+        name: order_by
+        type: string
+      - description: ASC ou DESC para ordenação
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Uma lista de vendas
+          schema:
+            items:
+              $ref: '#/definitions/responses.SaleResponse'
+            type: array
+        "400":
+          description: Erro de validação
+          schema:
+            type: string
+        "500":
+          description: Erro interno do sistema
+          schema:
+            type: string
+      summary: Obtém uma lista de vendas paginada e ordenada
+      tags:
+      - sales
     post:
       consumes:
       - application/json

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/emersonnobre/tica-api-go/src/internal/core/usecases"
 	"github.com/emersonnobre/tica-api-go/src/internal/core/usecases/types/requests"
@@ -11,11 +12,13 @@ import (
 
 type SaleHandler struct {
 	createSaleUseCase *usecases.CreateSaleUseCase
+	getSalesUseCase   *usecases.GetSalesUseCase
 }
 
-func NewSaleHandler(createSaleUseCase *usecases.CreateSaleUseCase) *SaleHandler {
+func NewSaleHandler(createSaleUseCase *usecases.CreateSaleUseCase, getSalesUseCase *usecases.GetSalesUseCase) *SaleHandler {
 	return &SaleHandler{
 		createSaleUseCase: createSaleUseCase,
+		getSalesUseCase:   getSalesUseCase,
 	}
 }
 
@@ -23,6 +26,7 @@ func (h *SaleHandler) RegisterRoutes(app *fiber.App) {
 	group := app.Group("/sales")
 
 	group.Post("/", h.Create)
+	group.Get("/", h.Get)
 }
 
 //	    CreateSale godoc
@@ -54,4 +58,37 @@ func (h *SaleHandler) Create(ctx *fiber.Ctx) error {
 		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
 	}
 	return ctx.SendStatus(http.StatusCreated)
+}
+
+//	    GetSales godoc
+//
+//		@Summary        Obtém uma lista de vendas paginada e ordenada
+//		@Description    Requisitos funcionais relacionados: 3D.
+//		@Tags           sales
+//		@Accept         json
+//		@Produce        json
+//		@Param          limit  			query      integer false "Limite de itens a serem obtidos"
+//		@Param          offset  		query      integer false "Quantidade de itens a serem pulados"
+//		@Param          order_by  		query      string  false "Nome do campo para ordenação (created_at, total_price)"
+//		@Param          order  			query      string  false "ASC ou DESC para ordenação"
+//		@Success        200 	{array}		responses.SaleResponse	 	"Uma lista de vendas"
+//		@Failure        400 	{string}	string	 					"Erro de validação"
+//		@Failure        500 	{string}	string	 					"Erro interno do sistema"
+//		@Router         /sales [get]
+func (h *SaleHandler) Get(ctx *fiber.Ctx) error {
+	limit, _ := strconv.Atoi(ctx.Query("limit"))
+	offset, _ := strconv.Atoi(ctx.Query("offset"))
+	orderBy := ctx.Query("order_by", "created_at")
+	order := ctx.Query("order", "asc")
+
+	request, err := requests.NewGetSalesRequest(limit, offset, orderBy, order)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	response := h.getSalesUseCase.Execute(request)
+	if response.ErrorName != nil {
+		return ctx.Status(util.CoreErrorToHttpError(*response.ErrorName)).SendString(*response.ErrorMessage)
+	}
+	return ctx.Status(http.StatusOK).JSON(response.Data)
 }

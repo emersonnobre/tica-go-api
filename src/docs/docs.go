@@ -800,6 +800,68 @@ const docTemplate = `{
             }
         },
         "/sales": {
+            "get": {
+                "description": "Requisitos funcionais relacionados: 3D.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sales"
+                ],
+                "summary": "Obtém uma lista de vendas paginada e ordenada",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limite de itens a serem obtidos",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Quantidade de itens a serem pulados",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Nome do campo para ordenação (created_at, total_price)",
+                        "name": "order_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "ASC ou DESC para ordenação",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Uma lista de vendas",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.SaleResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do sistema",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Registra uma nova venda.\nRequisitos funcionais relacionados: 3A, 3A.1.\nDesconto (discount): Desconto total em cima da venda. É opcional.\nObservações (comments): É opcional.\nTipo do pagamento (type_of_payment_id): Tipo do pagamento, 1, 2 ou 3. É obrigatório.\nFuncionário da venda (employee_id): É obrigatório.\nCliente da venda (customer_id): É obrigatório.\nItens da venda (items): Os produtos da venda e a quantidade de cada um.",
                 "consumes": [
@@ -1119,6 +1181,63 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "responses.SaleCustomerResponse": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.SaleEmployeeResponse": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.SaleResponse": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "customer": {
+                    "$ref": "#/definitions/responses.SaleCustomerResponse"
+                },
+                "discount": {
+                    "type": "number"
+                },
+                "employee": {
+                    "$ref": "#/definitions/responses.SaleEmployeeResponse"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "total_price": {
+                    "type": "number"
+                },
+                "type_of_payment": {
                     "type": "integer"
                 }
             }

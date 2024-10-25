@@ -60,7 +60,7 @@ func (u *CreateSaleUseCase) Execute(request *requests.CreateSaleRequest) types.U
 		if err != nil {
 			return types.NewErrorUseCaseResponse(types.GetInternalErrorName(), "Erro ao registrar venda!")
 		}
-		sale.TotalPrice += p.SalePrice
+		sale.TotalPrice += float32(item.Quantity) * p.SalePrice
 	}
 	if sale.Discount != nil {
 		sale.TotalPrice -= *sale.Discount

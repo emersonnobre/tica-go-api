@@ -34,5 +34,5 @@ func (u *GetProductsUseCase) Execute(limit int, offset int, orderBy string, orde
 
 	totalCount, _ := u.repository.GetCount(filters)
 	response := responses.NewPaginatedResponse(productsResponse, (offset/limit)+1, limit, totalCount)
-	return types.NewUseCaseResponse(response, nil, nil)
+	return types.NewSuccessUseCaseResponse(response)
 }
